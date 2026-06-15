@@ -23,7 +23,7 @@ class Item(models.Model):
 
     name = models.CharField(max_length=255)
 
-    description = models.CharField(blank=True)
+    description = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -48,6 +48,3 @@ class Book(models.Model):
     publisher = models.CharField(null=True, blank=True)
 
     pages = models.CharField(null=True, blank=True)
-
-    def __str__(self):
-        return self.name
