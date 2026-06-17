@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Icon } from './Icon.jsx';
 
 const objects = [
@@ -8,6 +9,8 @@ const objects = [
 ];
 
 export function InventoryOverview() {
+  const [selectedObject, setSelectedObject] = useState(objects[0].name);
+
   return (
     <section className="inventory-view">
       <div className="intro">
@@ -41,7 +44,20 @@ export function InventoryOverview() {
 
       <div className="object-grid">
         {objects.map((object) => (
-          <article className="object-card" key={object.name}>
+          <article
+            aria-pressed={selectedObject === object.name}
+            className={`object-card ${selectedObject === object.name ? 'selected' : ''}`}
+            key={object.name}
+            role="button"
+            tabIndex={0}
+            onClick={() => setSelectedObject(object.name)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setSelectedObject(object.name);
+              }
+            }}
+          >
             <div className={`object-mark ${object.color}`}>
               <Icon name={object.status === 'Favorito' ? 'heart' : 'book'} />
             </div>
@@ -49,7 +65,10 @@ export function InventoryOverview() {
               <h2>{object.name}</h2>
               <p>{object.type}</p>
             </div>
-            <span className="status-pill">{object.status}</span>
+            <div className="object-card-footer">
+              <span className="status-pill">{object.status}</span>
+              <span className="card-action">Ver detalle</span>
+            </div>
           </article>
         ))}
       </div>
