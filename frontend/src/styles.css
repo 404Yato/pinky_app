@@ -50,7 +50,9 @@ a {
 
 .sidebar[aria-hidden="true"] {
   opacity: 0;
-  transform: translateX(-1rem);
+  pointer-events: none;
+  transform: translateX(-100%);
+  visibility: hidden;
 }
 
 .user-card {

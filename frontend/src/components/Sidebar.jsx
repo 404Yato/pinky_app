@@ -7,7 +7,7 @@ const menuItems = [
 
 export function Sidebar({ activeSection, isOpen, onSelectSection }) {
   return (
-    <aside className="sidebar" aria-label="Menu principal" aria-hidden={!isOpen}>
+    <aside className="sidebar" aria-label="Menu principal" aria-hidden={!isOpen} inert={!isOpen ? '' : undefined}>
       <div className="user-card">
         <img src="/pinkyapp-icon.png" alt="Foto de usuario" className="user-avatar" />
         <div>
