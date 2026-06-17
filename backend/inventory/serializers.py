@@ -18,9 +18,23 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = '__all__'
+        read_only_fields = ['item']
 
 class VinylSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vinyl
         fields = '__all__'
+        read_only_fields = ['item']
+
+class ItemCreateSerializer(serializers.Serializer):
+    user = serializers.IntegerField()
+    item_type = serializers.IntegerField()
+    name = serializers.CharField()
+    description = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
+    details = serializers.JSONField(
+        required=False
+    )
