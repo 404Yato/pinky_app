@@ -72,12 +72,13 @@ def update_item_details(item, details_data):
 
     serializer.save()
 
-def get_active_item(pk):
+def get_active_item(pk, user):
 
     try:
         return models.Item.objects.select_related(
             'item_type'
         ).get(
+            user=user,
             pk=pk,
             deleted_at__isnull=True
         )

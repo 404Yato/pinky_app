@@ -28,7 +28,6 @@ class VinylSerializer(serializers.ModelSerializer):
         read_only_fields = ['item']
 
 class ItemCreateSerializer(serializers.Serializer):
-    user = serializers.IntegerField()
     item_type = serializers.IntegerField()
     name = serializers.CharField()
     description = serializers.CharField(

@@ -13,6 +13,7 @@ from .services import get_item_details, create_item_details, update_item_details
 def get_items(request):
 
     items = Item.objects.filter(
+        user=request.user,
         deleted_at__isnull=True
     )
 
@@ -24,7 +25,7 @@ def get_items(request):
 @permission_classes([IsAuthenticated])
 def get_item(request, pk):
 
-    item = get_active_item(pk)
+    item = get_active_item(pk, request.user)
 
     if not item:
         return Response(
@@ -54,7 +55,7 @@ def add_item(request):
     
     with transaction.atomic():
         item = Item.objects.create(
-            user_id=data['user'],
+            user=request.user,
             item_type_id=data['item_type'],
             name=data['name'],
             description=data.get(
@@ -77,7 +78,7 @@ def add_item(request):
 @permission_classes([IsAuthenticated])
 def update_item(request, pk):
     try:
-        item = Item.objects.get(pk=pk)
+        item = Item.objects.get(pk=pk, user=request.user)
     except Item.DoesNotExist:
         return Response(
             {"error":"Item Not Found"},
@@ -122,7 +123,7 @@ def update_item(request, pk):
 @permission_classes([IsAuthenticated])
 def delete_item(request, pk):
     
-    item = get_active_item(pk)
+    item = get_active_item(pk, request.user)
 
     if not item:
 
