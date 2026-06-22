@@ -2,12 +2,14 @@ from django.shortcuts import render
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 from .models import Item
 from .serializers import ItemSerializer, ItemCreateSerializer
 from .services import get_item_details, create_item_details, update_item_details, get_active_item
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_items(request):
 
     items = Item.objects.filter(
@@ -19,6 +21,7 @@ def get_items(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_item(request, pk):
 
     item = get_active_item(pk)
@@ -36,6 +39,7 @@ def get_item(request, pk):
     return Response(data)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_item(request):
     serializer = ItemCreateSerializer(
         data = request.data
@@ -70,6 +74,7 @@ def add_item(request):
     )
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_item(request, pk):
     try:
         item = Item.objects.get(pk=pk)
@@ -114,6 +119,7 @@ def update_item(request, pk):
     )
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def delete_item(request, pk):
     
     item = get_active_item(pk)
@@ -134,3 +140,13 @@ def delete_item(request, pk):
         status=204
         )
     
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def whoami(request):
+    return Response(
+        {
+            'id' : request.user.id,
+            'username' : request.user.username,
+            'email' : request.user.email
+        }
+    )
