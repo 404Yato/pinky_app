@@ -1,153 +1,83 @@
-from django.shortcuts import render
-from django.db import transaction
-from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
-from .models import Item
-from .serializers import ItemSerializer, ItemCreateSerializer
-from .services import get_item_details, create_item_details, update_item_details, get_active_item
+from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
+from rest_framework import status
+from .services import get_items, add_item, get_item, update_item, delete_item
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_items(request):
+class ItemListView(APIView):
 
-    items = Item.objects.filter(
-        user=request.user,
-        deleted_at__isnull=True
-    )
+    permission_classes = [IsAuthenticated]
 
-    serializer = ItemSerializer(items, many = True)
+    def get(self, request):
 
-    return Response(serializer.data)
+        data = get_items(request.user)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_item(request, pk):
+        return Response(data)
 
-    item = get_active_item(pk, request.user)
-
-    if not item:
-        return Response(
-            {'error': 'Item not found'},
-            status=404
-        )
-
-    data = ItemSerializer(item).data
-
-    data['details'] = get_item_details(item)
-
-    return Response(data)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def add_item(request):
-    serializer = ItemCreateSerializer(
-        data = request.data
-    )
-    if not serializer.is_valid():
-        return Response(
-            serializer.errors,
-            status=400
-    )
-
-    data = serializer.validated_data
-    
-    with transaction.atomic():
-        item = Item.objects.create(
-            user=request.user,
-            item_type_id=data['item_type'],
-            name=data['name'],
-            description=data.get(
-                'description',
-                ''
-            )
-        )
-
-        create_item_details(
-            item,
-            data.get('details')
-        )
-
-    return Response(
-        ItemSerializer(item).data,
-        status=201
-    )
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update_item(request, pk):
-    try:
-        item = Item.objects.get(pk=pk, user=request.user)
-    except Item.DoesNotExist:
-        return Response(
-            {"error":"Item Not Found"},
-            status=404
-        )
-    
-    data = request.data.copy()
-
-    details_data = data.pop(
-        'details',
-        None
-    )
-
-    serializer = ItemSerializer(
-        item,
-        data=data,
-        partial=True
-    )
-
-    if not serializer.is_valid():
-        return Response(
-            serializer.errors,
-            status=400
-        )
-
-    with transaction.atomic():
+    def post(self, request):
         
-        serializer.save()
+        try:
+            item_data = add_item(request.data, request.user)
+        
+            return Response(
+                item_data,
+                status=status.HTTP_201_CREATED
+            )
+        
+        except ValidationError as e:
+            return Response(
+                e.detail,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
 
-        update_item_details(
-            item,
-            details_data
-        )
-
-
-    return Response(
-        {"message" : f"Item {pk} updated successfully."},
-        status=200
-    )
-
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def delete_item(request, pk):
+class ItemDetailView(APIView):
     
-    item = get_active_item(pk, request.user)
+    permission_classes = [IsAuthenticated]
 
-    if not item:
+    def get(self, request, pk):
+        
+        item_data = get_item(pk, request.user)
 
         return Response(
-            {'error': 'Item not found'},
-            status=404
-        )
-
-    item.deleted_at = timezone.now()
-
-    item.save()
-
-    return Response(
-        {"message" : f"Item {pk} deleted successfully."},
-        status=204
+            item_data,
+            status=status.HTTP_200_OK
         )
     
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def whoami(request):
-    return Response(
-        {
-            'id' : request.user.id,
-            'username' : request.user.username,
-            'email' : request.user.email
-        }
-    )
+    def put(self, request, pk):
+
+        item_data = update_item(pk, request.user, request.data)
+
+        return Response(
+            {
+                "message" : f"Item {pk} updated successfully.",
+                "data" : item_data
+            },
+            status=status.HTTP_200_OK
+        )
+    
+    def delete(self, request, pk):
+
+        item_data = delete_item(pk, request.user)
+
+        return Response(
+            {
+                "message" : f"Item {pk} soft deleted successfully",
+                "data" : item_data
+            },
+            status=status.HTTP_200_OK
+        )
+
+class WhoAmIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response(
+            {
+                'id' : request.user.id,
+                'username' : request.user.username,
+                'email' : request.user.email
+            }
+        )
