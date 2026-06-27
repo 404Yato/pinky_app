@@ -35,5 +35,8 @@ class ItemCreateSerializer(serializers.Serializer):
         allow_blank=True
     )
     details = serializers.JSONField(
-        required=False
+        required=False,
+        help_text=(
+        "Objeto JSON cuyos campos dependen del tipo de item."
+    )
     )

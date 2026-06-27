@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'inventory',
     'authentication',
     'rest_framework_simplejwt.token_blacklist',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -114,6 +115,16 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Pinky App API",
+    "DESCRIPTION": (
+        "API REST para Pinky App, una aplicación de inventario personal "
+        "que permite a los usuarios gestionar y clasificar sus objetos y colecciones."
+    ),
+    "VERSION": "1.0.0",
 }
 
 SIMPLE_JWT = {
