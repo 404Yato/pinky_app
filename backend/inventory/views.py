@@ -4,13 +4,20 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from drf_spectacular.utils import (extend_schema, OpenApiResponse, OpenApiExample)
-from .serializers import ItemSerializer, ItemCreateSerializer
+from .serializers import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, WhoAmIResponseSerializer
 from .services import get_items, add_item, get_item, update_item, delete_item
+
+# ITEM_id_PARAMETER = OpenApiParameter(
+#         name="id",
+#         type=int,
+#         location=OpenApiParameter.PATH,
+#         description="Identificador del item."
+#     )
 
 class ItemListView(APIView):
 
     permission_classes = [IsAuthenticated]
-
+    
     @extend_schema(
         tags=["Items"],
         summary="Obtener todos los items",
@@ -120,36 +127,99 @@ class ItemDetailView(APIView):
     
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk):
+    @extend_schema(
+        tags=["Items"],
+        summary="Obtener un item",
+        description=(
+            "Obtiene un item específico perteneciente al usuario autenticado. "
+            "No es posible acceder a items de otros usuarios ni a items eliminados mediante soft delete."
+        ),
+
+        responses={
+            200: ItemSerializer,
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description="El item no existe o no pertenece al usuario."
+            ),
+        },
+    )
+    def get(self, request, id):
         
-        item_data = get_item(pk, request.user)
+        item_data = get_item(id, request.user)
 
         return Response(
             item_data,
             status=status.HTTP_200_OK
         )
     
-    def put(self, request, pk):
+    @extend_schema(
+        tags=["Items"],
+        summary="Actualizar un item",
+        description=(
+            "Actualiza un item existente perteneciente al usuario autenticado."
+        ),
+        request=ItemCreateSerializer,
+        responses={
+            200: ItemResponseSerializer,
+            400: OpenApiResponse(
+                description="Los datos enviados no son válidos."
+            ),
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description="El item no existe."
+            ),
+        },
+    )
+    def put(self, request, id):
 
-        item_data = update_item(pk, request.user, request.data)
+        item_data = update_item(id, request.user, request.data)
+
+        response_data = {
+                "message" : f"Item {id} updated successfully.",
+                "data" : item_data
+            }
+        
+        response = ItemResponseSerializer(response_data)
 
         return Response(
-            {
-                "message" : f"Item {pk} updated successfully.",
-                "data" : item_data
-            },
+            response.data,
             status=status.HTTP_200_OK
         )
     
-    def delete(self, request, pk):
+    @extend_schema(
+        tags=["Items"],
+        summary="Eliminar un item",
+        description=(
+            "Realiza un soft delete del item indicado. "
+            "El registro permanece almacenado en la base de datos, "
+            "pero deja de estar disponible para el usuario."
+        ),
+        responses={
+            200: ItemResponseSerializer,
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description="El item no existe."
+            ),
+        },
+    )
+    def delete(self, request, id):
 
-        item_data = delete_item(pk, request.user)
+        item_data = delete_item(id, request.user)
 
-        return Response(
-            {
-                "message" : f"Item {pk} soft deleted successfully",
+        response_data = {
+                "message" : f"Item {id} soft deleted successfully",
                 "data" : item_data
-            },
+            }
+        
+        response = ItemResponseSerializer(response_data)
+        return Response(
+            response.data,
             status=status.HTTP_200_OK
         )
 
@@ -157,11 +227,42 @@ class WhoAmIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["Authentication"],
+        summary="Obtener información del usuario autenticado",
+        description=(
+            "Devuelve la información básica del usuario autenticado "
+            "a partir del Access Token enviado en la solicitud."
+        ),
+        responses={
+            200: WhoAmIResponseSerializer,
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+        },
+        examples=[
+            OpenApiExample(
+                "Respuesta",
+                response_only=True,
+                value={
+                    "id": 1,
+                    "username": "usuario123",
+                    "email": "usuario123@gmail.com"
+                }
+            )
+        ]
+    )
     def get(self, request):
-        return Response(
+
+        response = WhoAmIResponseSerializer(
             {
-                'id' : request.user.id,
-                'username' : request.user.username,
-                'email' : request.user.email
+                "id": request.user.id,
+                "username": request.user.username,
+                "email": request.user.email,
             }
+        )
+
+        return Response(
+            response.data,
+            status=status.HTTP_200_OK,
         )

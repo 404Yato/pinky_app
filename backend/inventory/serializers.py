@@ -40,3 +40,22 @@ class ItemCreateSerializer(serializers.Serializer):
         "Objeto JSON cuyos campos dependen del tipo de item."
     )
     )
+
+class ItemResponseSerializer(serializers.Serializer):
+
+    message = serializers.CharField()
+
+    data = ItemSerializer()
+
+class WhoAmIResponseSerializer(serializers.Serializer):
+
+    id = serializers.IntegerField(
+        help_text="Identificador único del usuario."
+    )
+    username = serializers.CharField(
+        max_length=150,
+        help_text="Nombre de usuario."
+    )
+    email = serializers.EmailField(
+        help_text="Correo electrónico del usuario."
+    )
