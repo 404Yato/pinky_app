@@ -9,7 +9,7 @@ A personal inventory application designed to manage collections and keep track o
 ## Live Demo
 
 Backend API:
-https://....
+https://pinky-api.up.railway.app/api/docs
 
 Frontend:
 https://cmts-pinky-app.vercel.app/ (Mock-up)
