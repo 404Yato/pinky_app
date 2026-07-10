@@ -1,0 +1,32 @@
+# Entorno virtual
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Variables de entorno
+.env
+.env.*
+
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# IDEs
+.vscode/
+.idea/
+
+# Tests y cache
+.pytest_cache/
+.mypy_cache/
+
+# Base de datos local
+*.sqlite3
+
+# Logs
+*.log
