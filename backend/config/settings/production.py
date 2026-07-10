@@ -2,8 +2,18 @@ from .base import *
 
 DEBUG = False
 
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Seguridad básica
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+
+
+# HTTPS (las activaremos cuando tengamos dominio)
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+
+
+# Headers permitidos
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
