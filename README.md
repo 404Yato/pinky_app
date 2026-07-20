@@ -1,66 +1,96 @@
-# Pinky App 😸
+# PinkyApp 📚🐱
 
-A personal inventory application designed to manage collections and keep track of meaningful items such as books, vinyl records, games, figures, and other personal belongings.
+PinkyApp is a personal digital library designed for readers who enjoy keeping their books organized, documented, and always within reach.
+
+Rather than being just a catalog, PinkyApp aims to provide a cozy and enjoyable space where every bookshelf tells a story, making it easy to manage your personal library, track your reading journey, and rediscover your favorite books.
 
 <img width="500" height="500" alt="pinkyapp-icon" src="https://github.com/user-attachments/assets/ff525916-3ef6-40db-a48b-7b4b175e23ad" />
 
 ---
 
-## Live Demo
+# Live Demo
 
-Backend API:
+### Backend API
+
 https://pinky-api.up.railway.app/api/docs
 
-Frontend:
-https://cmts-pinky-app.vercel.app/ (Mock-up)
+### Frontend (Prototype)
 
-## Architecture
-
-Pinky App follows a separated frontend/backend architecture:
-
-* **Backend:** Django + Django REST Framework
-* **Frontend:** React + Vite
-* **Database:** PostgreSQL
-* **Authentication:** JWT
-* **API Documentation:** OpenAPI + Swagger
-* **Deployment:** Docker + Gunicorn
+https://cmts-pinky-app.vercel.app/
 
 ---
 
-## Features
+# Tech Stack
 
-* User authentication with JWT
-* User-based object management
-* Personal inventory system
-* Dynamic item types
-* REST API architecture
-* API documentation with Swagger UI
-* PostgreSQL database integration
-* Dockerized development and production environments
+- **Backend:** Django + Django REST Framework
+- **Frontend:** React + Vite
+- **Database:** PostgreSQL
+- **Authentication:** JWT
+- **API Documentation:** OpenAPI + Swagger
+- **Deployment:** Docker + Gunicorn
 
 ---
 
-## Project Structure
+# Vision
+
+PinkyApp is being built around a single idea:
+
+> **Creating the digital library we would love to use ourselves.**
+
+Instead of trying to support every possible collectible, PinkyApp focuses exclusively on books, allowing the experience, interface, and features to revolve entirely around reading and personal libraries.
+
+The goal is to create a calm, welcoming, and visually pleasing place where readers can organize, explore, and enjoy their collections.
+
+---
+
+# Current Features
+
+- JWT authentication
+- Personal book library
+- User-owned collections
+- REST API
+- PostgreSQL integration
+- OpenAPI / Swagger documentation
+- Docker development environment
+- Production-ready deployment
+
+---
+
+# Planned Features
+
+- Personal bookshelves
+- Reading status tracking
+- Reading progress
+- Favorites
+- Ratings and reviews
+- Reading statistics
+- Beautiful bookshelf visualization
+- Responsive interface
+
+---
+
+# Project Structure
 
 ```text
-pinky/
+pinkyapp/
 │
-├── backend/          # Django REST API
-│
-├── frontend/         # React application
+├── backend/                 # Django REST API
+├── frontend/                # React + Vite application
 │
 ├── docker-compose.yml
+├── docker-compose.prod.yml
 │
+├── .gitignore
 └── README.md
 ```
 
 ---
 
-## Backend
+# Backend
 
-The backend is a REST API built with Django REST Framework.
+The backend exposes a REST API developed with Django REST Framework.
 
-For detailed backend documentation, architecture decisions, API information, and setup instructions, check:
+Additional documentation is available at:
 
 ```text
 backend/README.md
@@ -68,11 +98,11 @@ backend/README.md
 
 ---
 
-## Frontend
+# Frontend
 
-The frontend application is built with React and Vite.
+The frontend is currently being rebuilt using React and Vite with a reader-first experience.
 
-Documentation will be available at:
+Future documentation will be available at:
 
 ```text
 frontend/README.md
@@ -80,17 +110,15 @@ frontend/README.md
 
 ---
 
-## Running the Project
+# Running the Project
 
-### Using Docker
-
-Build and start the development environment:
+### Development
 
 ```bash
 docker compose up --build
 ```
 
-Production environment:
+### Production
 
 ```bash
 docker compose -f docker-compose.prod.yml up --build
@@ -98,24 +126,22 @@ docker compose -f docker-compose.prod.yml up --build
 
 ---
 
-## Project Status
+# Project Status
 
-Pinky App is currently under active development.
+🟡 Active Development
 
-The backend has reached a functional MVP stage, including:
+The backend has reached a functional MVP, including:
 
-* Authentication system
-* Inventory management
-* API documentation
-* Production-ready containerization
+- Authentication
+- Book management API
+- Swagger documentation
+- PostgreSQL integration
+- Dockerized deployment
 
-The next steps include frontend development, additional documentation, and deployment.
+The current focus is the complete redesign and implementation of the frontend to deliver a reader-centered experience.
 
 ---
 
-## Author
+# Author
 
-Developed by Cristian Tapia.
-
-
-
+Developed by **Cristian Tapia**.
