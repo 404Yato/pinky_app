@@ -4,6 +4,8 @@ PinkyApp is a personal digital library designed for readers who enjoy keeping th
 
 Rather than being just a catalog, PinkyApp aims to provide a cozy and enjoyable space where every bookshelf tells a story, making it easy to manage your personal library, track your reading journey, and rediscover your favorite books.
 
+Every screen in PinkyApp should feel less like a management application and more like a physical space dedicated to books and their readers.
+
 <img width="500" height="500" alt="pinkyapp-icon" src="https://github.com/user-attachments/assets/ff525916-3ef6-40db-a48b-7b4b175e23ad" />
 
 ---
