@@ -1,0 +1,24 @@
+|                 COLORES PRINCIPALES           |
+| ----------------------------------------------|
+| Uso              | Color          | Hex       |
+| ---------------- | -------------- | --------- |
+| Fondo principal  | Warm Parchment | #F5F1E8 |
+| Fondo secundario | Soft Linen     | #ECE5D8 |
+| Sidebar          | Dark Walnut    | #6B4B3A |
+| Estantería       | Natural Oak    | #A87345 |
+| Texto principal  | Espresso       | #2F2B28 |
+| Texto secundario | Warm Taupe     | #6E655F |
+| Acento principal | Sage Green     | #6F8A66 |
+| Hover            | Soft Sage      | #9CB096 |
+| Bordes           | Aged Paper     | #D8CCBC |
+
+|                COLORES COMPLEMENTARIOS            |
+| --------------------------------------------------|
+| Uso                    | Color        | Hex       |
+| ---------------------- | ------------ | --------- |
+| Tarjetas / Papel       | Ivory Paper  | #FBF8F3 |
+| Botón primario         | Walnut Brown | #7C563A |
+| Botón primario (Hover) | Rich Walnut  | #684530 |
+| Éxito                  | Forest Sage  | #5E7A58 |
+| Advertencia            | Amber Honey  | #C79A47 |
+| Error                  | Brick Red    | #A45A52 |
