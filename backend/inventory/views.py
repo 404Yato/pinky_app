@@ -266,3 +266,12 @@ class WhoAmIView(APIView):
             response.data,
             status=status.HTTP_200_OK,
         )
+    
+class Health(APIView):
+
+    def get(self, request):
+        response = {
+            "status" : "ok"
+        }
+
+        return Response(response)
