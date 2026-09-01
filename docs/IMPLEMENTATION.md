@@ -34,6 +34,141 @@ The agent MUST NOT:
 The agent may inspect the backend when necessary to understand existing data structures, but must not modify it.
 
 ---
+# Canonical Data Model
+
+The frontend must follow the existing backend domain model.
+
+This section defines the canonical data structure that mock data, frontend services, hooks, forms and UI state should represent.
+
+The frontend may adapt naming for presentation purposes, but it must not invent a conflicting domain model.
+
+The backend remains the source of truth for persistent data structure.
+
+---
+
+## Entity Structure
+
+Pinky uses a shared base entity called `Item`.
+
+Type-specific entities such as `Book` extend an `Item` through a one-to-one relationship.
+
+Conceptually:
+
+```text
+User
+  |
+  └── Item
+       ├── ItemType
+       ├── Book
+       └── Vinyl
+```
+
+`Item` owns the fields shared by every collectible. `Book` and `Vinyl` contain only type-specific details and use a one-to-one relationship whose primary key references the owning `Item`.
+
+The current Pinky frontend implements books only. Vinyl is documented here so the shared Item boundary does not prevent Vinyl support from being added cleanly in another application later. This phase must not add Vinyl UI to Pinky.
+
+## Canonical Structures
+
+### ItemType
+
+| Field | Type | Nullable | Ownership and purpose |
+| --- | --- | --- | --- |
+| `id` | integer | No | ItemType identifier |
+| `name` | string | No | Human-readable type name |
+| `detail_type` | string | No | Discriminates the related detail entity, such as `BOOK` or `VINYL` |
+
+### Item
+
+| Field | Type | Nullable | Ownership and purpose |
+| --- | --- | --- | --- |
+| `id` | integer | No | Shared Item identifier |
+| `user` | integer / foreign key | No | Owner of the Item |
+| `item_type` | integer / foreign key | No | References `ItemType` |
+| `name` | string | No | Shared display name; exposed as `title` by the book view model |
+| `description` | string | No | Shared description; use an empty string when absent |
+| `favorite` | boolean | No | Shared favorite state; never belongs to Book or Vinyl |
+| `created_at` | ISO datetime string | No | Creation timestamp |
+| `updated_at` | ISO datetime string | No | Last-update timestamp |
+| `deleted_at` | ISO datetime string | Yes | Soft-deletion timestamp; `null` means active |
+
+### Book
+
+| Field | Type | Nullable | Ownership and purpose |
+| --- | --- | --- | --- |
+| `item` | integer / one-to-one key | No | References the owning `Item` and serves as the Book identifier |
+| `isbn` | string | Yes | ISBN or equivalent book identifier |
+| `author` | string | Yes | Book author |
+| `publisher` | string | Yes | Book publisher |
+| `pages` | positive integer | Yes | Page count; domain values must never be strings |
+| `publication_year` | positive integer | Yes | Publication year; domain values must never be strings |
+| `genre` | string | Yes | Book genre |
+| `cover_url` | URL string | Yes | Cover image URL |
+| `reading_status` | enum string | No | One of `PENDING`, `READING`, or `READ` |
+
+### Vinyl
+
+| Field | Type | Nullable | Ownership and purpose |
+| --- | --- | --- | --- |
+| `item` | integer / one-to-one key | No | References the owning `Item` and serves as the Vinyl identifier |
+| `artist` | string | No | Recording artist |
+| `label` | string | Yes | Record label |
+| `release_year` | integer | Yes | Release year; domain values must never be strings |
+| `barcode` | string | Yes | Barcode or catalog identifier |
+| `discs` | integer | Yes | Disc count; domain values must never be strings |
+| `rpm` | integer | Yes | Playback speed; domain values must never be strings |
+
+## Reading Status
+
+Book reading status is a canonical domain enum. The only valid stored values are:
+
+```text
+PENDING
+READING
+READ
+```
+
+Friendly and translated labels may be used in the UI, but mock records, services, commands, and future API payloads must retain the uppercase canonical values.
+
+## Frontend Mapping Policy
+
+Canonical records use backend-compatible snake_case. React-facing view models may use camelCase and book-specific presentation names, but every conversion must be centralized in an adapter.
+
+Required Item mappings:
+
+```text
+BookViewModel.id          ← Item.id
+BookViewModel.title       ← Item.name
+BookViewModel.description ← Item.description
+BookViewModel.favorite    ← Item.favorite
+BookViewModel.createdAt   ← Item.created_at
+BookViewModel.updatedAt   ← Item.updated_at
+BookViewModel.deletedAt   ← Item.deleted_at
+```
+
+Required Book mappings:
+
+```text
+BookViewModel.author          ← Book.author
+BookViewModel.isbn            ← Book.isbn
+BookViewModel.publisher       ← Book.publisher
+BookViewModel.pages           ← Book.pages
+BookViewModel.publicationYear ← Book.publication_year
+BookViewModel.genre           ← Book.genre
+BookViewModel.coverUrl        ← Book.cover_url
+BookViewModel.readingStatus   ← Book.reading_status
+```
+
+The reverse mapping for create and update commands must explicitly send `title` to `Item.name`, `favorite` to `Item.favorite`, shared fields to Item data, and type-specific fields to Book detail data.
+
+Form controls may temporarily hold numeric input as strings. Command adapters must convert those values to numbers or `null` before domain storage. Nullable Book and Vinyl fields use `null`; absent `Item.description` uses an empty string.
+
+## Soft Deletion
+
+Items are deleted by setting `Item.deleted_at` to an ISO datetime and updating `Item.updated_at`. The underlying Item and detail record remain stored.
+
+Normal list, search, filter, sort, and detail operations must exclude records whose `Item.deleted_at` is not `null`. Soft-deleted Items must not appear as active collection entries.
+
+---
 
 # 1. Project Goal
 
@@ -106,7 +241,7 @@ const books = [
     title: "Dune",
     author: "Frank Herbert",
     cover: "/assets/books/dune.jpg",
-    status: "read",
+    readingStatus: "READ",
     favorite: true,
     description: "..."
   }
