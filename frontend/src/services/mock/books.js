@@ -1,4 +1,9 @@
 import {
+  bookFormToCreateCommand,
+  bookFormToUpdateCommand,
+  bookRecordToViewModel,
+} from "../../adapters/books.js";
+import {
   BOOK_SORT_FIELD,
   BOOK_SORT_FIELDS,
   DEFAULT_BOOK_QUERY,
@@ -7,6 +12,7 @@ import {
   SORT_DIRECTION,
   SORT_DIRECTIONS,
 } from "../../constants/books.js";
+import { ITEM_TYPE_ID, MOCK_USER_ID } from "../../constants/items.js";
 import { mockBooks } from "../../data/mockBooks.js";
 
 export class MockBookServiceError extends Error {
@@ -18,22 +24,19 @@ export class MockBookServiceError extends Error {
 }
 
 const clone = (value) => structuredClone(value);
-const cleanOptionalString = (value) => {
-  if (value === undefined || value === null) return null;
-  const cleaned = String(value).trim();
-  return cleaned || null;
-};
 const normalizeForSearch = (value) =>
   String(value ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLocaleLowerCase("es");
 
-let books = clone(mockBooks);
+let records = clone(mockBooks);
 
-function findBookIndex(id) {
+function findRecordIndex(id, { includeDeleted = false } = {}) {
   const normalizedId = Number(id);
-  const index = books.findIndex((book) => book.id === normalizedId);
+  const index = records.findIndex(
+    (record) => record.item.id === normalizedId && (includeDeleted || record.item.deleted_at === null),
+  );
 
   if (index === -1) {
     throw new MockBookServiceError("No encontramos el libro solicitado.", "BOOK_NOT_FOUND");
@@ -48,58 +51,26 @@ function validateStatus(status) {
   }
 }
 
-function normalizeBookInput(input, { partial = false } = {}) {
-  if (!input || typeof input !== "object" || Array.isArray(input)) {
-    throw new MockBookServiceError("Los datos del libro no son válidos.", "INVALID_BOOK_DATA");
+function validateRecord(record) {
+  if (!record.item.name) {
+    throw new MockBookServiceError("El título del libro es obligatorio.", "TITLE_REQUIRED");
   }
-
-  const normalized = {};
-
-  if (!partial || Object.hasOwn(input, "title")) {
-    const title = cleanOptionalString(input.title);
-    if (!title) {
-      throw new MockBookServiceError("El título del libro es obligatorio.", "TITLE_REQUIRED");
-    }
-    normalized.title = title;
+  if (record.book.pages !== null && (!Number.isInteger(record.book.pages) || record.book.pages <= 0)) {
+    throw new MockBookServiceError("La cantidad de páginas debe ser un número entero positivo.", "INVALID_PAGES");
   }
-
-  for (const field of ["author", "description", "isbn", "publisher", "genre", "coverUrl"]) {
-    if (!partial || Object.hasOwn(input, field)) normalized[field] = cleanOptionalString(input[field]);
+  if (
+    record.book.publication_year !== null &&
+    (!Number.isInteger(record.book.publication_year) || record.book.publication_year < 1)
+  ) {
+    throw new MockBookServiceError("El año de publicación no es válido.", "INVALID_PUBLICATION_YEAR");
   }
+  validateStatus(record.book.reading_status);
+}
 
-  if (!partial || Object.hasOwn(input, "pages")) {
-    if (input.pages === undefined || input.pages === null || input.pages === "") {
-      normalized.pages = null;
-    } else {
-      const pages = Number(input.pages);
-      if (!Number.isInteger(pages) || pages <= 0) {
-        throw new MockBookServiceError("La cantidad de páginas debe ser un número entero positivo.", "INVALID_PAGES");
-      }
-      normalized.pages = pages;
-    }
-  }
-
-  if (!partial || Object.hasOwn(input, "publicationYear")) {
-    if (input.publicationYear === undefined || input.publicationYear === null || input.publicationYear === "") {
-      normalized.publicationYear = null;
-    } else {
-      const publicationYear = Number(input.publicationYear);
-      if (!Number.isInteger(publicationYear) || publicationYear < 1) {
-        throw new MockBookServiceError("El año de publicación no es válido.", "INVALID_PUBLICATION_YEAR");
-      }
-      normalized.publicationYear = publicationYear;
-    }
-  }
-
-  if (!partial || Object.hasOwn(input, "readingStatus")) {
-    const readingStatus = input.readingStatus ?? READING_STATUS.PENDING;
-    validateStatus(readingStatus);
-    normalized.readingStatus = readingStatus;
-  }
-
-  if (!partial || Object.hasOwn(input, "favorite")) normalized.favorite = Boolean(input.favorite);
-
-  return normalized;
+function activeViewModels() {
+  return records
+    .filter((record) => record.item.deleted_at === null)
+    .map(bookRecordToViewModel);
 }
 
 function applySearch(collection, query) {
@@ -122,7 +93,7 @@ function applyFilters(collection, { status = null, favorite = null, genre = null
   return clone(
     collection.filter((book) => {
       if (status !== null && book.readingStatus !== status) return false;
-      if (favorite !== null && book.favorite !== Boolean(favorite)) return false;
+      if (favorite !== null && book.favorite !== favorite) return false;
       if (normalizedGenre && normalizeForSearch(book.genre) !== normalizedGenre) return false;
       return true;
     }),
@@ -142,91 +113,123 @@ function applySort(
 
   const direction = sortDirection === SORT_DIRECTION.ASCENDING ? 1 : -1;
   const sorted = clone(collection);
-
   sorted.sort((first, second) => {
     const firstValue = first[sortBy];
     const secondValue = second[sortBy];
     if (firstValue === secondValue) return first.id - second.id;
     if (firstValue === null || firstValue === undefined) return 1;
     if (secondValue === null || secondValue === undefined) return -1;
-
     if (typeof firstValue === "string" && !sortBy.endsWith("At")) {
       return firstValue.localeCompare(secondValue, "es", { sensitivity: "base" }) * direction;
     }
-
     return (firstValue < secondValue ? -1 : 1) * direction;
   });
-
   return sorted;
 }
 
 export async function getBooks(options = {}) {
   const query = { ...DEFAULT_BOOK_QUERY, ...options };
-  let result = applySearch(books, query.search);
+  let result = applySearch(activeViewModels(), query.search);
   result = applyFilters(result, query);
   return applySort(result, query);
 }
 
 export async function searchBooks(query) {
-  return applySearch(books, query);
+  return applySearch(activeViewModels(), query);
 }
 
 export async function filterBooks(filters = {}) {
-  return applyFilters(books, filters);
+  return applyFilters(activeViewModels(), filters);
 }
 
 export async function sortBooks(options = {}) {
-  return applySort(books, options);
+  return applySort(activeViewModels(), options);
 }
 
 export async function getBook(id) {
-  return clone(books[findBookIndex(id)]);
+  return clone(bookRecordToViewModel(records[findRecordIndex(id)]));
 }
 
 export async function createBook(input) {
+  const command = bookFormToCreateCommand(input);
   const now = new Date().toISOString();
-  const nextId = books.reduce((highestId, book) => Math.max(highestId, book.id), 0) + 1;
-  const createdBook = {
-    id: nextId,
-    ...normalizeBookInput(input),
-    createdAt: now,
-    updatedAt: now,
+  const nextId = records.reduce((highestId, record) => Math.max(highestId, record.item.id), 0) + 1;
+  const record = {
+    item: {
+      id: nextId,
+      user: MOCK_USER_ID,
+      item_type: ITEM_TYPE_ID.BOOK,
+      ...command.item,
+      created_at: now,
+      updated_at: now,
+      deleted_at: null,
+    },
+    book: {
+      item: nextId,
+      ...command.book,
+    },
   };
 
-  books = [...books, createdBook];
-  return clone(createdBook);
+  validateRecord(record);
+  records = [...records, record];
+  return clone(bookRecordToViewModel(record));
 }
 
 export async function updateBook(id, input) {
-  const index = findBookIndex(id);
-  const currentBook = books[index];
-  const updatedBook = {
-    ...currentBook,
-    ...normalizeBookInput(input, { partial: true }),
-    id: currentBook.id,
-    createdAt: currentBook.createdAt,
-    updatedAt: new Date().toISOString(),
+  const index = findRecordIndex(id);
+  const currentRecord = records[index];
+  const command = bookFormToUpdateCommand(input);
+  const updatedRecord = {
+    item: {
+      ...currentRecord.item,
+      ...command.item,
+      id: currentRecord.item.id,
+      user: currentRecord.item.user,
+      item_type: currentRecord.item.item_type,
+      created_at: currentRecord.item.created_at,
+      updated_at: new Date().toISOString(),
+      deleted_at: currentRecord.item.deleted_at,
+    },
+    book: {
+      ...currentRecord.book,
+      ...command.book,
+      item: currentRecord.book.item,
+    },
   };
 
-  books = books.map((book, bookIndex) => (bookIndex === index ? updatedBook : book));
-  return clone(updatedBook);
+  validateRecord(updatedRecord);
+  records = records.map((record, recordIndex) => (recordIndex === index ? updatedRecord : record));
+  return clone(bookRecordToViewModel(updatedRecord));
 }
 
 export async function deleteBook(id) {
-  const index = findBookIndex(id);
-  const [deletedBook] = books.splice(index, 1);
-  return clone(deletedBook);
+  const index = findRecordIndex(id);
+  const now = new Date().toISOString();
+  const deletedRecord = {
+    ...records[index],
+    item: {
+      ...records[index].item,
+      updated_at: now,
+      deleted_at: now,
+    },
+  };
+
+  records = records.map((record, recordIndex) => (recordIndex === index ? deletedRecord : record));
+  return clone(bookRecordToViewModel(deletedRecord));
 }
 
 export async function toggleFavorite(id) {
-  const index = findBookIndex(id);
-  const updatedBook = {
-    ...books[index],
-    favorite: !books[index].favorite,
-    updatedAt: new Date().toISOString(),
+  const index = findRecordIndex(id);
+  const updatedRecord = {
+    ...records[index],
+    item: {
+      ...records[index].item,
+      favorite: !records[index].item.favorite,
+      updated_at: new Date().toISOString(),
+    },
   };
-  books = books.map((book, bookIndex) => (bookIndex === index ? updatedBook : book));
-  return clone(updatedBook);
+  records = records.map((record, recordIndex) => (recordIndex === index ? updatedRecord : record));
+  return clone(bookRecordToViewModel(updatedRecord));
 }
 
 export async function updateReadingStatus(id, status) {
@@ -235,5 +238,5 @@ export async function updateReadingStatus(id, status) {
 }
 
 export function resetMockBooks() {
-  books = clone(mockBooks);
+  records = clone(mockBooks);
 }

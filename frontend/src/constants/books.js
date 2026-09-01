@@ -1,7 +1,7 @@
 export const READING_STATUS = Object.freeze({
-  PENDING: "pending",
-  READING: "reading",
-  READ: "read",
+  PENDING: "PENDING",
+  READING: "READING",
+  READ: "READ",
 });
 
 export const READING_STATUSES = Object.freeze(Object.values(READING_STATUS));
