@@ -37,6 +37,10 @@ class Item(models.Model):
         blank=True
     )
 
+    favorite = models.BooleanField(
+        default=False
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
@@ -46,7 +50,8 @@ class Item(models.Model):
     )
 
     deleted_at = models.DateTimeField(
-        null=True, blank=True
+        null=True,
+        blank=True
     )
 
     def __str__(self):
@@ -60,29 +65,52 @@ class Book(models.Model):
     )
 
     isbn = models.CharField(
-        max_length=20, 
-        null=True, 
+        max_length=20,
+        null=True,
         blank=True
     )
 
     author = models.CharField(
+        max_length=255,
         null=True,
         blank=True
     )
 
     publisher = models.CharField(
+        max_length=255,
         null=True,
         blank=True
     )
 
-    pages = models.CharField(
+    pages = models.PositiveIntegerField(
         null=True,
         blank=True
     )
 
-    publication_year = models.CharField( 
+    publication_year = models.PositiveIntegerField(
         null=True,
         blank=True
+    )
+
+    genre = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True
+    )
+
+    cover_url = models.URLField(
+        null=True,
+        blank=True
+    )
+
+    reading_status = models.CharField(
+        max_length=20,
+        choices=[
+            ("PENDING", "Pending"),
+            ("READING", "Reading"),
+            ("READ", "Read"),
+        ],
+        default="PENDING"
     )
 
 class Vinyl(models.Model):

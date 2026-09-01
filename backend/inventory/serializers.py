@@ -34,6 +34,7 @@ class ItemCreateSerializer(serializers.Serializer):
         required=False,
         allow_blank=True
     )
+    favorite = serializers.BooleanField(),
     details = serializers.JSONField(
         required=False,
         help_text=(

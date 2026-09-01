@@ -64,12 +64,16 @@ class ItemListView(APIView):
                     "item_type": 1,
                     "name": "Más allá del bien y del mal",
                     "description": 'Publicado en 1886 el libro se coloca más allá de las doctrinas dualistas, de ahí su título. De nuevo Nietzsche lanza una potente diatriba contra el mundo moderno y tras destruir sus doctrinas levanta su "ciencia de la moral" que tendrá su continuidad en la Genealogía de la moral, rechazando toda suerte de hipocresías que han esclavizado y esclavizan a la humanidad e impiden el advenimiento del superhombre.',
+                    "favorite": True,
                     "details": {
                         "isbn": "9788410109254",
                         "author": "Friedrich Nietzsche",
                         "publisher": "Editorial Fontana",
                         "pages": 246,
                         "publication_year":"2023",
+                        "genre": "mistery",
+                        "cover_url": "www.google.com",
+                        "reading_status": "PENDING"
                     },
                 }
             ),
@@ -79,6 +83,7 @@ class ItemListView(APIView):
                 value={
                     "item_type": 1,
                     "name": "Más allá del bien y del mal",
+                    "favorite": True,
                     "description": "Lado A\n\n1. Don't Panic (2:17)\n\n2. Shiver (5:00)\n\n3. Spies (5:18)\n\n4. Sparks (3:47)\n\n5. Yellow (4:29)\n\nLado B\n\n6. Trouble (4:30)\n\n7. Parachutes (0:46)\n\n8. High Speed (4:14)\n\n9. We Never Change (4:09)\n\n10. Everything's Not Lost (5:31)",
                     "details": {
                         "artist": "Coldplay",
@@ -124,6 +129,7 @@ class ItemListView(APIView):
         
 
 class ItemDetailView(APIView):
+
     
     permission_classes = [IsAuthenticated]
 
