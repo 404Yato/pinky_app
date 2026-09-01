@@ -22,3 +22,39 @@
 | Éxito                  | Forest Sage  | #5E7A58 |
 | Advertencia            | Amber Honey  | #C79A47 |
 | Error                  | Brick Red    | #A45A52 |
+
+PINKY DESIGN SYSTEM
+────────────────────
+
+Background
+  paper       #F5EFE4
+  paper-dark  #EDE3D2
+
+Text
+  ink         #3B2A20
+  brown       #735B48
+
+Brand
+  wood        #8B5E3C
+  wood-dark   #68432B
+
+Accent
+  terracotta  #C9824B
+  caramel     #DFA574
+
+Border
+  parchment   #D8C7B2
+
+
+| Uso              | Color     | Sensación               |
+| ---------------- | --------- | ----------------------- |
+| Fondo principal  | #F5EFE4 | Papel crema             |
+| Fondo secundario | #EDE3D2 | Papel envejecido        |
+| Superficie/card  | #FBF7EF | Página nueva            |
+| Texto principal  | #3B2A20 | Café oscuro             |
+| Texto secundario | #735B48 | Madera/café             |
+| Primario         | #8B5E3C | Cuero/madera            |
+| Primario oscuro  | #68432B | Madera profunda         |
+| Acento           | #C9824B | Terracota/naranja suave |
+| Acento suave     | #DFA574 | Café con leche          |
+| Borde            | #D8C7B2 | Papel/cartón            |
