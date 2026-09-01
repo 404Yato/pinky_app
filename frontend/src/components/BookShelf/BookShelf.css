@@ -1,6 +1,0 @@
-.bookShelf {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  border: 10px solid #a87345;
-}
