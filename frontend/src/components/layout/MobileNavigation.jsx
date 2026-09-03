@@ -28,10 +28,10 @@ export function MobileNavigation({ open, onClose, activeItem, onNavigate }) {
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
-      className="mobile-navigation m-0 h-dvh max-h-none w-[min(20rem,86vw)] max-w-none bg-sidebar p-0 text-sidebar-foreground shadow-2xl lg:hidden"
+      className="mobile-navigation m-0 h-dvh max-h-none w-[min(20rem,calc(100vw-2rem))] max-w-none overflow-hidden bg-sidebar p-0 text-sidebar-foreground shadow-2xl lg:hidden"
     >
       <div className="flex h-full flex-col">
-        <div className="flex h-20 items-center gap-3 border-b border-sidebar-border px-5">
+        <div className="flex min-h-20 items-center gap-3 border-b border-sidebar-border px-4 pt-[env(safe-area-inset-top)] min-[380px]:px-5">
           <span className="grid size-10 place-items-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
             <Books aria-hidden="true" className="size-6" weight="duotone" />
           </span>
@@ -54,7 +54,7 @@ export function MobileNavigation({ open, onClose, activeItem, onNavigate }) {
         <AppNavigation
           activeItem={activeItem}
           onNavigate={handleNavigate}
-          className="flex-1 overflow-y-auto px-4 py-6"
+          className="flex-1 overflow-y-auto px-3 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] min-[380px]:px-4 min-[380px]:py-6"
         />
       </div>
     </dialog>

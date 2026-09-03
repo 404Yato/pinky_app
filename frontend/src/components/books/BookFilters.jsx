@@ -22,9 +22,9 @@ export function BookFilters({ filters, onChange, onReset, hasActiveFilters, show
       </div>
 
       <div className={cn(
-        "grid gap-3 md:grid-cols-2",
+        "grid gap-3 sm:grid-cols-2",
         showStatus && showFavorite
-          ? "xl:grid-cols-[minmax(16rem,1fr)_12rem_12rem_13rem]"
+          ? "2xl:grid-cols-[minmax(16rem,1fr)_12rem_12rem_13rem]"
           : "xl:grid-cols-[minmax(16rem,1fr)_12rem_13rem]",
       )}>
         <label className="relative block">

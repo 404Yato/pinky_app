@@ -14,7 +14,7 @@ export function BookStatus({ status }) {
   const Icon = details.icon;
 
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold", details.className)}>
+    <span className={cn("inline-flex max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold", details.className)}>
       <Icon aria-hidden="true" className="size-3.5" weight="fill" />
       {details.label}
     </span>

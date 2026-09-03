@@ -30,13 +30,13 @@ export function BookFormPage({ bookId = null, onCancel, onSaved }) {
   };
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto min-w-0 max-w-4xl pb-20 sm:pb-16">
       <button type="button" onClick={onCancel} className="mb-6 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-primary hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <ArrowLeft aria-hidden="true" className="size-4" /> Volver
       </button>
       <header className="mb-8">
         <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-primary"><BookOpen aria-hidden="true" className="size-4" /> {editing ? "Actualizar historia" : "Nueva historia"}</p>
-        <h1 className="mt-2 font-heading text-4xl font-semibold tracking-tight sm:text-5xl">{editing ? "Editar libro" : "Agregar un libro"}</h1>
+        <h1 className="mt-2 font-heading text-3xl font-semibold tracking-tight min-[380px]:text-4xl sm:text-5xl">{editing ? "Editar libro" : "Agregar un libro"}</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">{editing ? "Ajusta la información que quieras conservar en tu biblioteca." : "Comienza con lo esencial. Siempre podrás completar o corregir la información más adelante."}</p>
       </header>
       <BookForm key={book?.id ?? "new"} book={book} onSubmit={handleSubmit} onCancel={onCancel} />

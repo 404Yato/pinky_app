@@ -25,13 +25,13 @@ export function LibraryPage({ onSelectBook, onCreateBook }) {
 
   return (
     <div>
-      <header className="mb-8 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
+      <header className="mb-7 flex flex-col items-stretch justify-between gap-5 sm:mb-8 sm:flex-row sm:items-end">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Tu colección</p>
-          <h1 className="mt-2 font-heading text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">Biblioteca</h1>
+          <h1 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-foreground min-[380px]:text-4xl sm:text-5xl">Biblioteca</h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">Historias leídas, pendientes y en curso, reunidas en un solo lugar.</p>
         </div>
-        <Button onClick={onCreateBook} className="h-11 shrink-0 gap-2 px-4 text-sm"><Plus aria-hidden="true" /> Agregar libro</Button>
+        <Button onClick={onCreateBook} className="h-11 w-full shrink-0 gap-2 px-4 text-sm sm:w-auto"><Plus aria-hidden="true" /> Agregar libro</Button>
       </header>
 
       <BookFilters filters={filters} onChange={handleChange} onReset={resetFilters} hasActiveFilters={hasActiveFilters} />

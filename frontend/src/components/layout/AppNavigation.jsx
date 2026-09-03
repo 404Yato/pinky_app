@@ -27,9 +27,9 @@ export function AppNavigation({ activeItem = "home", onNavigate, className }) {
                 )}
               >
                 <Icon aria-hidden="true" className="size-5 shrink-0" weight={isActive ? "fill" : "regular"} />
-                <span className="flex-1">{item.label}</span>
+                <span className="min-w-0 flex-1 truncate">{item.label}</span>
                 {!item.available && (
-                  <span className="text-[0.625rem] font-semibold uppercase tracking-[0.08em] opacity-75">
+                  <span className="hidden shrink-0 text-[0.625rem] font-semibold uppercase tracking-[0.08em] opacity-75 min-[300px]:inline">
                     Próximamente
                   </span>
                 )}

@@ -34,8 +34,8 @@ export function DeleteBookDialog({ book, open, onClose, onDeleted }) {
   };
 
   return (
-    <dialog ref={dialogRef} aria-labelledby="delete-book-title" aria-describedby="delete-book-description" onCancel={onClose} onClose={onClose} className="modal-dialog m-auto w-[min(28rem,calc(100%-2rem))] max-w-none rounded-lg border border-border bg-card p-0 text-foreground shadow-2xl">
-      <div className="p-6 sm:p-7">
+    <dialog ref={dialogRef} aria-labelledby="delete-book-title" aria-describedby="delete-book-description" onCancel={onClose} onClose={onClose} className="modal-dialog m-auto max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100%-2rem))] max-w-none overflow-y-auto rounded-lg border border-border bg-card p-0 text-foreground shadow-2xl">
+      <div className="p-5 sm:p-7">
         <span className="grid size-12 place-items-center rounded-full bg-destructive/10 text-destructive"><Trash aria-hidden="true" className="size-6" weight="duotone" /></span>
         <h2 id="delete-book-title" className="mt-5 font-heading text-2xl font-semibold">¿Eliminar este libro?</h2>
         <p id="delete-book-description" className="mt-2 text-sm leading-6 text-muted-foreground">“{book.title}” dejará de aparecer en tu biblioteca durante esta sesión.</p>

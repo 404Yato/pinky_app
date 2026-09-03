@@ -25,7 +25,7 @@ export function BookCard({ book, onSelect }) {
           {book.title}
         </h2>
         <p className="mt-1 truncate text-xs text-muted-foreground sm:text-sm">{book.author || "Autor desconocido"}</p>
-        <div className="mt-3 flex items-center justify-between gap-2">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <BookStatus status={book.readingStatus} />
           {book.publicationYear && <span className="text-xs text-muted-foreground">{book.publicationYear}</span>}
         </div>

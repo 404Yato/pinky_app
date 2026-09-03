@@ -15,8 +15,10 @@ export function LoadingBookGrid() {
   return (
     <div role="status" aria-label="Cargando libros">
       <span className="sr-only">Cargando tu biblioteca.</span>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 xl:grid-cols-4 xl:gap-6">
-        {Array.from({ length: 8 }, (_, index) => <LoadingBookCard key={index} />)}
+      <div className="@container">
+        <div className="grid grid-cols-1 gap-4 @min-[22rem]:grid-cols-2 @min-[36rem]:grid-cols-3 @min-[52rem]:grid-cols-4 sm:gap-5 xl:gap-6">
+          {Array.from({ length: 8 }, (_, index) => <LoadingBookCard key={index} />)}
+        </div>
       </div>
     </div>
   );

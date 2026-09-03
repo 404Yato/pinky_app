@@ -126,7 +126,10 @@
     @apply min-h-dvh bg-background text-foreground antialiased;
     }
   html {
-    @apply font-sans scheme-light;
+    @apply min-w-0 font-sans scheme-light;
+    }
+  img, svg {
+    @apply max-w-full;
     }
   button {
     @apply cursor-pointer;

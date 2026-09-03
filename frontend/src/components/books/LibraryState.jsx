@@ -6,11 +6,11 @@ export function LibraryEmptyState({ filtered, onReset, title, description, Icon:
   const Icon = filtered ? MagnifyingGlass : (EmptyIcon ?? Books);
 
   return (
-    <section className="rounded-lg border border-dashed border-border bg-card/60 px-6 py-16 text-center" aria-labelledby="empty-library-title">
+    <section className="rounded-lg border border-dashed border-border bg-card/60 px-4 py-12 text-center sm:px-6 sm:py-16" aria-labelledby="empty-library-title">
       <span className="mx-auto grid size-14 place-items-center rounded-full bg-secondary text-primary">
         <Icon aria-hidden="true" className="size-7" weight="duotone" />
       </span>
-      <h2 id="empty-library-title" className="mt-5 font-heading text-2xl font-semibold text-foreground">
+      <h2 id="empty-library-title" className="mt-5 font-heading text-xl font-semibold text-foreground sm:text-2xl">
         {filtered ? "No encontramos libros con esos criterios." : (title ?? "Tu biblioteca está esperando su primera historia.")}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
@@ -23,7 +23,7 @@ export function LibraryEmptyState({ filtered, onReset, title, description, Icon:
 
 export function LibraryErrorState({ onRetry }) {
   return (
-    <section className="rounded-lg border border-border bg-card px-6 py-16 text-center" role="alert">
+    <section className="rounded-lg border border-border bg-card px-4 py-12 text-center sm:px-6 sm:py-16" role="alert">
       <WarningCircle aria-hidden="true" className="mx-auto size-10 text-destructive" weight="duotone" />
       <h2 className="mt-4 font-heading text-2xl font-semibold text-foreground">No pudimos cargar tu biblioteca.</h2>
       <p className="mt-2 text-sm text-muted-foreground">Intenta nuevamente.</p>

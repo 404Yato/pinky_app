@@ -5,7 +5,7 @@ import { UserProfile } from "@/components/layout/UserProfile";
 export function AppHeader({ title, user, onLogout, onOpenNavigation }) {
   return (
     <header className="sticky top-0 z-10 border-b border-border/80 bg-background/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:h-20 lg:px-10">
+      <div className="mx-auto flex h-16 min-w-0 max-w-7xl items-center gap-2 px-3 min-[380px]:gap-3 min-[380px]:px-4 sm:gap-4 sm:px-6 lg:h-20 lg:px-8 xl:px-10">
         <button
           type="button"
           aria-label="Abrir navegación"
@@ -18,7 +18,7 @@ export function AppHeader({ title, user, onLogout, onOpenNavigation }) {
         <p className="min-w-0 flex-1 truncate font-heading text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
           {title}
         </p>
-        <div className="border-l border-border pl-4 sm:pl-5">
+        <div className="shrink-0 border-l border-border pl-2 min-[380px]:pl-3 sm:pl-5">
           <UserProfile user={user} onLogout={onLogout} />
         </div>
       </div>

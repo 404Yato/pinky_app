@@ -79,7 +79,7 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-8">
-      <fieldset className="rounded-lg border border-border bg-card p-5 sm:p-7">
+      <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">
         <legend className="px-2 font-heading text-xl font-semibold">Información principal</legend>
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-foreground sm:col-span-2">
@@ -96,7 +96,7 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
         </div>
       </fieldset>
 
-      <fieldset className="rounded-lg border border-border bg-card p-5 sm:p-7">
+      <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">
         <legend className="px-2 font-heading text-xl font-semibold">Datos de la edición</legend>
         <div className="grid gap-5 sm:grid-cols-2">
           {field("publisher", "Editorial")}
@@ -106,7 +106,7 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
         </div>
       </fieldset>
 
-      <fieldset className="rounded-lg border border-border bg-card p-5 sm:p-7">
+      <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">
         <legend className="px-2 font-heading text-xl font-semibold">Tu lectura</legend>
         <div className="grid items-end gap-5 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-foreground">
@@ -126,7 +126,7 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
 
       {submitError && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">{submitError}</p>}
 
-      <div className="sticky bottom-4 flex flex-col-reverse gap-3 rounded-lg border border-border bg-background/95 p-3 shadow-[0_8px_30px_rgb(59_42_32_/_0.12)] backdrop-blur-sm sm:flex-row sm:justify-end">
+      <div className="sticky bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[5] flex flex-col-reverse gap-3 rounded-lg border border-border bg-background/95 p-3 shadow-[0_8px_30px_rgb(59_42_32_/_0.12)] backdrop-blur-sm sm:bottom-4 sm:flex-row sm:justify-end">
         <Button type="button" variant="outline" onClick={onCancel} disabled={submitting} className="h-11 px-5 text-sm">Cancelar</Button>
         <Button type="submit" disabled={submitting} className="h-11 px-5 text-sm">{submitting ? "Guardando…" : book ? "Guardar cambios" : "Agregar a mi biblioteca"}</Button>
       </div>
