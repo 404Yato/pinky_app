@@ -704,12 +704,12 @@ The dashboard should feel like entering a personal library rather than viewing b
 
 Potential sections:
 
-* [ ] Welcome/header section
-* [ ] Library statistics
-* [ ] Recently added books
-* [ ] Currently reading
-* [ ] Favorites
-* [ ] Reading progress
+* [x] Welcome/header section
+* [x] Library statistics
+* [x] Recently added books
+* [x] Currently reading
+* [x] Favorites
+* [x] Reading progress
 
 Statistics should be calculated from mock data.
 
@@ -745,10 +745,10 @@ Provide focused views of the user's collection.
 
 ## Features
 
-* [ ] Favorites
-* [ ] Read
-* [ ] Reading
-* [ ] Pending / unread
+* [x] Favorites
+* [x] Read
+* [x] Reading
+* [x] Pending / unread
 
 Reuse the same book components whenever possible.
 
@@ -772,13 +772,13 @@ Create the authentication experience visually without implementing backend authe
 
 ## Features
 
-* [ ] Login page
-* [ ] Login form
-* [ ] Password field
-* [ ] Validation
-* [ ] Loading state
-* [ ] Error state
-* [ ] Authentication-related visual states
+* [x] Login page
+* [x] Login form
+* [x] Password field
+* [x] Validation
+* [x] Loading state
+* [x] Error state
+* [x] Authentication-related visual states
 
 Authentication may use a temporary mock state if necessary to demonstrate navigation.
 
@@ -1222,24 +1222,24 @@ A frontend feature is considered complete only when:
 
 ## Dashboard
 
-* [ ] Dashboard page
-* [ ] Library statistics
-* [ ] Recent books
-* [ ] Reading overview
+* [x] Dashboard page
+* [x] Library statistics
+* [x] Recent books
+* [x] Reading overview
 
 ## Authentication UI
 
-* [ ] Login
-* [ ] Local/mock authentication state
-* [ ] Validation
-* [ ] Error state
-* [ ] Loading state
+* [x] Login
+* [x] Local/mock authentication state
+* [x] Validation
+* [x] Error state
+* [x] Loading state
 
 ## Responsive
 
-* [ ] Desktop
-* [ ] Tablet
-* [ ] Mobile
+* [x] Desktop
+* [x] Tablet
+* [x] Mobile
 
 ## Final Polish
 
