@@ -1,18 +1,23 @@
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { navigateTo, readRoute } from "@/lib/routes";
+import { getFocusedCollection, getFocusedCollectionByPath } from "@/config/collections";
+import { navigateTo, readRoute, withReturnTo } from "@/lib/routes";
 import { HomePage } from "@/pages/HomePage";
 import { BookDetailPage } from "@/pages/BookDetailPage";
 import { BookFormPage } from "@/pages/BookFormPage";
 import { LibraryPage } from "@/pages/LibraryPage";
+import { FocusedCollectionPage } from "@/pages/FocusedCollectionPage";
 
 function App() {
   const [route, setRoute] = useState(readRoute);
   const isLibrary = route.page === "library";
   const isBookDetail = route.page === "book-detail";
   const isBookForm = route.page === "book-create" || route.page === "book-edit";
-  const activeItem = isLibrary || isBookDetail || isBookForm ? "library" : "home";
+  const isCollection = route.page === "collection";
+  const collection = isCollection ? getFocusedCollection(route.collectionId) : null;
+  const returnCollection = getFocusedCollectionByPath(route.returnTo);
+  const activeItem = collection?.id ?? returnCollection?.id ?? (isLibrary || isBookDetail || isBookForm ? "library" : "home");
 
   useEffect(() => {
     const handleRouteChange = () => setRoute(readRoute());
@@ -21,18 +26,26 @@ function App() {
   }, []);
 
   const handleNavigate = (itemId) => {
-    navigateTo(itemId === "library" ? "/library" : "/");
+    const destination = getFocusedCollection(itemId)?.path ?? (itemId === "library" ? "/library" : "/");
+    navigateTo(destination);
   };
 
-  const pageTitle = isBookForm ? (route.page === "book-edit" ? "Editar libro" : "Agregar libro") : isBookDetail ? "Detalle del libro" : isLibrary ? "Biblioteca" : "Inicio";
+  const pageTitle = collection?.label ?? (isBookForm ? (route.page === "book-edit" ? "Editar libro" : "Agregar libro") : isBookDetail ? "Detalle del libro" : isLibrary ? "Biblioteca" : "Inicio");
   const successMessage = route.success === "created" ? "El libro se agregó a tu biblioteca." : route.success === "updated" ? "Los cambios se guardaron correctamente." : null;
 
   return (
     <AppShell title={pageTitle} activeItem={activeItem} onNavigate={handleNavigate}>
-      {isBookDetail && <BookDetailPage bookId={route.bookId} onBack={() => navigateTo("/library")} onEdit={() => navigateTo(`/library/${route.bookId}/edit`)} onDeleted={() => navigateTo("/library")} successMessage={successMessage} />}
-      {isBookForm && <BookFormPage bookId={route.bookId} onCancel={() => navigateTo(route.bookId ? `/library/${route.bookId}` : "/library")} onSaved={(book, action) => navigateTo(`/library/${book.id}?success=${action}`)} />}
+      {isBookDetail && <BookDetailPage bookId={route.bookId} onBack={() => navigateTo(route.returnTo)} onEdit={() => navigateTo(withReturnTo(`/library/${route.bookId}/edit`, route.returnTo))} onDeleted={() => navigateTo(route.returnTo)} successMessage={successMessage} />}
+      {isBookForm && <BookFormPage bookId={route.bookId} onCancel={() => navigateTo(route.bookId ? withReturnTo(`/library/${route.bookId}`, route.returnTo) : "/library")} onSaved={(book, action) => navigateTo(withReturnTo(`/library/${book.id}?success=${action}`, route.returnTo))} />}
       {isLibrary && <LibraryPage onSelectBook={(bookId) => navigateTo(`/library/${bookId}`)} onCreateBook={() => navigateTo("/library/new")} />}
-      {!isLibrary && !isBookDetail && !isBookForm && <HomePage />}
+      {collection && <FocusedCollectionPage key={collection.id} collection={collection} onSelectBook={(bookId) => navigateTo(withReturnTo(`/library/${bookId}`, collection.path))} />}
+      {!isLibrary && !isBookDetail && !isBookForm && !isCollection && (
+        <HomePage
+          onBrowse={() => navigateTo("/library")}
+          onCreateBook={() => navigateTo("/library/new")}
+          onSelectBook={(bookId) => navigateTo(`/library/${bookId}`)}
+        />
+      )}
     </AppShell>
   );
 }

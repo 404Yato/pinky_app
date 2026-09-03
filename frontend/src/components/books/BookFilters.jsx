@@ -1,10 +1,11 @@
 import { FunnelSimple, MagnifyingGlass, X } from "@phosphor-icons/react";
 
 import { BOOK_SORT_FIELD, READING_STATUS, SORT_DIRECTION } from "@/constants/books";
+import { cn } from "@/lib/utils";
 
 const controlClassName = "h-11 w-full rounded-md border border-input bg-card px-3 text-sm text-foreground outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20";
 
-export function BookFilters({ filters, onChange, onReset, hasActiveFilters }) {
+export function BookFilters({ filters, onChange, onReset, hasActiveFilters, showStatus = true, showFavorite = true }) {
   return (
     <section aria-labelledby="library-filters-title" className="mb-8 rounded-lg border border-border bg-card p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -20,7 +21,12 @@ export function BookFilters({ filters, onChange, onReset, hasActiveFilters }) {
         )}
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(16rem,1fr)_12rem_12rem_13rem]">
+      <div className={cn(
+        "grid gap-3 md:grid-cols-2",
+        showStatus && showFavorite
+          ? "xl:grid-cols-[minmax(16rem,1fr)_12rem_12rem_13rem]"
+          : "xl:grid-cols-[minmax(16rem,1fr)_12rem_13rem]",
+      )}>
         <label className="relative block">
           <span className="sr-only">Buscar libros</span>
           <MagnifyingGlass aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -33,7 +39,7 @@ export function BookFilters({ filters, onChange, onReset, hasActiveFilters }) {
           />
         </label>
 
-        <label>
+        {showStatus && <label>
           <span className="sr-only">Estado de lectura</span>
           <select value={filters.status ?? ""} onChange={(event) => onChange("status", event.target.value || null)} className={controlClassName}>
             <option value="">Todos los estados</option>
@@ -41,16 +47,16 @@ export function BookFilters({ filters, onChange, onReset, hasActiveFilters }) {
             <option value={READING_STATUS.PENDING}>Pendientes</option>
             <option value={READING_STATUS.READ}>Leídos</option>
           </select>
-        </label>
+        </label>}
 
-        <label>
+        {showFavorite && <label>
           <span className="sr-only">Favoritos</span>
           <select value={filters.favorite ?? ""} onChange={(event) => onChange("favorite", event.target.value === "" ? null : event.target.value === "true")} className={controlClassName}>
             <option value="">Todos los libros</option>
             <option value="true">Solo favoritos</option>
             <option value="false">No favoritos</option>
           </select>
-        </label>
+        </label>}
 
         <label>
           <span className="sr-only">Ordenar libros</span>
