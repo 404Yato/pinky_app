@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 export function DashboardLoadingState() {
   return (
     <div role="status" aria-label="Cargando resumen de la biblioteca" className="space-y-10">
+      <h1 className="sr-only">Cargando tu biblioteca</h1>
       <span className="sr-only">Preparando tu biblioteca.</span>
       <div className="max-w-2xl space-y-4">
         <div className="h-4 w-40 animate-pulse rounded bg-secondary" />

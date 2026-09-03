@@ -21,9 +21,9 @@ export function BookCard({ book, onSelect }) {
       </div>
 
       <div className="p-3.5 sm:p-4">
-        <h2 className="font-heading text-base font-semibold leading-snug text-card-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] sm:text-lg">
+        <h3 className="font-heading text-base font-semibold leading-snug text-card-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] sm:text-lg">
           {book.title}
-        </h2>
+        </h3>
         <p className="mt-1 truncate text-xs text-muted-foreground sm:text-sm">{book.author || "Autor desconocido"}</p>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <BookStatus status={book.readingStatus} />

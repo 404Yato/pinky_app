@@ -5,12 +5,16 @@ import { AppNavigation } from "@/components/layout/AppNavigation";
 
 export function MobileNavigation({ open, onClose, activeItem, onNavigate }) {
   const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
@@ -42,6 +46,7 @@ export function MobileNavigation({ open, onClose, activeItem, onNavigate }) {
             <p className="mt-1 truncate text-xs text-sidebar-foreground/65">Tu biblioteca personal</p>
           </div>
           <button
+            ref={closeButtonRef}
             type="button"
             aria-label="Cerrar navegación"
             onClick={onClose}

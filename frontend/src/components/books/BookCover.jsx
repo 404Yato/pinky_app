@@ -1,19 +1,23 @@
+import { useState } from "react";
 import { BookOpenText } from "@phosphor-icons/react";
 
 const coverStyles = [
-  "from-[#68432b] to-[#9b6a47] text-[#fffaf2]",
-  "from-[#735b48] to-[#b08a69] text-[#fffaf2]",
-  "from-[#8b5e3c] to-[#c9824b] text-[#fffaf2]",
-  "from-[#4f5545] to-[#7d8067] text-[#fffaf2]",
+  "from-[#68432b] to-[#7a4f34] text-[#fffaf2]",
+  "from-[#5f493a] to-[#765a45] text-[#fffaf2]",
+  "from-[#70472f] to-[#8b5e3c] text-[#fffaf2]",
+  "from-[#4f5545] to-[#626650] text-[#fffaf2]",
   "from-[#59404a] to-[#8b6471] text-[#fffaf2]",
 ];
 
 export function BookCover({ book }) {
-  if (book.coverUrl) {
+  const [failedUrl, setFailedUrl] = useState(null);
+
+  if (book.coverUrl && failedUrl !== book.coverUrl) {
     return (
       <img
         src={book.coverUrl}
         alt={`Portada de ${book.title}`}
+        onError={() => setFailedUrl(book.coverUrl)}
         className="aspect-[2/3] h-full w-full object-cover"
       />
     );

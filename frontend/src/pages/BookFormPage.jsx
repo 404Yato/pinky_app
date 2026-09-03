@@ -10,7 +10,7 @@ export function BookFormPage({ bookId = null, onCancel, onSaved }) {
   const editing = bookId !== null;
   const { book, status, retry } = useBook(bookId, { enabled: editing });
 
-  if (editing && status === "loading") return <BookDetailSkeleton />;
+  if (editing && status === "loading") return <BookDetailSkeleton label="Cargando edición del libro" />;
   if (editing && (status === "not-found" || status === "error")) {
     return (
       <section className="rounded-lg border border-border bg-card px-6 py-16 text-center" role={status === "error" ? "alert" : undefined}>

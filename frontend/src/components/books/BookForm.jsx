@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { READING_STATUS } from "@/constants/books";
@@ -24,6 +24,7 @@ function getInitialValues(book) {
 }
 
 export function BookForm({ book = null, onSubmit, onCancel }) {
+  const formRef = useRef(null);
   const [values, setValues] = useState(() => getInitialValues(book));
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -44,6 +45,9 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
       nextErrors.publicationYear = "Ingresa un año válido.";
     }
     setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      window.requestAnimationFrame(() => formRef.current?.querySelector('[aria-invalid="true"]')?.focus());
+    }
     return Object.keys(nextErrors).length === 0;
   };
 
@@ -78,13 +82,14 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
   );
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-8">
+    <form ref={formRef} onSubmit={handleSubmit} noValidate aria-busy={submitting} className="space-y-8">
+      {Object.keys(errors).length > 0 && <p role="alert" className="sr-only">Revisa los campos indicados antes de guardar el libro.</p>}
       <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">
         <legend className="px-2 font-heading text-xl font-semibold">Información principal</legend>
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-foreground sm:col-span-2">
             Título <span aria-hidden="true" className="text-destructive">*</span>
-            <input autoFocus value={values.title} onChange={(event) => updateField("title", event.target.value)} aria-invalid={Boolean(errors.title)} aria-describedby={errors.title ? "title-error" : undefined} className={inputClassName} />
+            <input autoFocus required aria-required="true" value={values.title} onChange={(event) => updateField("title", event.target.value)} aria-invalid={Boolean(errors.title)} aria-describedby={errors.title ? "title-error" : undefined} className={inputClassName} />
             {errors.title && <span id="title-error" className="mt-1.5 block text-xs font-normal text-destructive">{errors.title}</span>}
           </label>
           {field("author", "Autor")}

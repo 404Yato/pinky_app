@@ -1,11 +1,18 @@
+import { useEffect } from "react";
 import { BookOpenText, Books, Coffee } from "@phosphor-icons/react";
 
 import { LoginForm } from "@/components/auth/LoginForm";
 import { DEMO_CREDENTIALS } from "@/services/mock/auth";
 
 export function LoginPage({ onLogin }) {
+  useEffect(() => {
+    document.title = "Iniciar sesión | Pinky";
+  }, []);
+
   return (
-    <main className="grid min-h-dvh min-w-0 bg-background lg:grid-cols-[minmax(20rem,0.8fr)_minmax(28rem,1.2fr)] xl:grid-cols-[minmax(24rem,0.8fr)_minmax(30rem,1.2fr)]">
+    <>
+      <a href="#login-content" className="fixed left-4 top-4 z-50 -translate-y-24 rounded-md bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition-transform focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background motion-reduce:transition-none">Saltar al inicio de sesión</a>
+      <main id="login-content" tabIndex="-1" className="grid min-h-dvh min-w-0 bg-background focus:outline-none lg:grid-cols-[minmax(20rem,0.8fr)_minmax(28rem,1.2fr)] xl:grid-cols-[minmax(24rem,0.8fr)_minmax(30rem,1.2fr)]">
       <section className="relative hidden overflow-hidden bg-sidebar px-10 py-12 text-sidebar-foreground lg:flex lg:flex-col lg:justify-between xl:px-16">
         <div className="flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"><Books aria-hidden="true" className="size-6" weight="duotone" /></span>
@@ -39,6 +46,7 @@ export function LoginPage({ onLogin }) {
           <p className="mt-6 text-center text-xs leading-5 text-muted-foreground">Esta experiencia usa una sesión local de demostración. No se envían datos a ningún servidor.</p>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }

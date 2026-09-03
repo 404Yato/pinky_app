@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Eye, EyeSlash, SignIn, WarningCircle } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { validateLoginValues } from "@/lib/auth";
 const inputClassName = "mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-ring focus:ring-2 focus:ring-ring/20 aria-invalid:border-destructive aria-invalid:ring-destructive/20";
 
 export function LoginForm({ onSubmit, initialEmail = "" }) {
+  const formRef = useRef(null);
   const [values, setValues] = useState({ email: initialEmail, password: "" });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -25,7 +26,10 @@ export function LoginForm({ onSubmit, initialEmail = "" }) {
 
     const validation = validateLoginValues(values);
     setErrors(validation.errors);
-    if (!validation.valid) return;
+    if (!validation.valid) {
+      window.requestAnimationFrame(() => formRef.current?.querySelector('[aria-invalid="true"]')?.focus());
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError("");
@@ -39,17 +43,18 @@ export function LoginForm({ onSubmit, initialEmail = "" }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
+    <form ref={formRef} onSubmit={handleSubmit} noValidate aria-busy={submitting} className="mt-8 space-y-5">
+      {Object.keys(errors).length > 0 && <p role="alert" className="sr-only">Revisa los campos indicados antes de continuar.</p>}
       <label className="block text-sm font-semibold text-foreground">
         Correo electrónico
-        <input type="email" autoComplete="email" autoFocus value={values.email} onChange={(event) => updateField("email", event.target.value)} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "login-email-error" : undefined} className={inputClassName} placeholder="tu@correo.com" />
+        <input type="email" autoComplete="email" autoFocus required aria-required="true" value={values.email} onChange={(event) => updateField("email", event.target.value)} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "login-email-error" : undefined} className={inputClassName} placeholder="tu@correo.com" />
         {errors.email && <span id="login-email-error" className="mt-1.5 block text-xs font-normal text-destructive">{errors.email}</span>}
       </label>
 
       <label className="block text-sm font-semibold text-foreground">
         Contraseña
         <span className="relative mt-2 block">
-          <input type={showPassword ? "text" : "password"} autoComplete="current-password" value={values.password} onChange={(event) => updateField("password", event.target.value)} aria-invalid={Boolean(errors.password)} aria-describedby={errors.password ? "login-password-error" : undefined} className={`${inputClassName} mt-0 pr-12`} />
+          <input type={showPassword ? "text" : "password"} autoComplete="current-password" required aria-required="true" value={values.password} onChange={(event) => updateField("password", event.target.value)} aria-invalid={Boolean(errors.password)} aria-describedby={errors.password ? "login-password-error" : undefined} className={`${inputClassName} mt-0 pr-12`} />
           <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} aria-pressed={showPassword} className="absolute right-0 top-0 grid size-11 place-items-center rounded-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             {showPassword ? <EyeSlash aria-hidden="true" className="size-5" /> : <Eye aria-hidden="true" className="size-5" />}
           </button>
