@@ -1,9 +1,8 @@
 import { List } from "@phosphor-icons/react";
 
 import { UserProfile } from "@/components/layout/UserProfile";
-import { mockCurrentUser } from "@/data/mockUser";
 
-export function AppHeader({ title, onOpenNavigation }) {
+export function AppHeader({ title, user, onLogout, onOpenNavigation }) {
   return (
     <header className="sticky top-0 z-10 border-b border-border/80 bg-background/95 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:h-20 lg:px-10">
@@ -20,7 +19,7 @@ export function AppHeader({ title, onOpenNavigation }) {
           {title}
         </p>
         <div className="border-l border-border pl-4 sm:pl-5">
-          <UserProfile user={mockCurrentUser} />
+          <UserProfile user={user} onLogout={onLogout} />
         </div>
       </div>
     </header>

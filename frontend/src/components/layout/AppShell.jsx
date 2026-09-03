@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { MobileNavigation } from "@/components/layout/MobileNavigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 
-export function AppShell({ title, activeItem, onNavigate, children }) {
+export function AppShell({ title, activeItem, onNavigate, user, onLogout, children }) {
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
 
   return (
@@ -18,7 +18,7 @@ export function AppShell({ title, activeItem, onNavigate, children }) {
       />
 
       <div className="min-h-dvh lg:pl-64">
-        <AppHeader title={title} onOpenNavigation={() => setMobileNavigationOpen(true)} />
+        <AppHeader title={title} user={user} onLogout={onLogout} onOpenNavigation={() => setMobileNavigationOpen(true)} />
         <main id="main-content" className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-10 lg:py-16">
           {children}
         </main>

@@ -9,6 +9,10 @@ test("parses each focused collection route", () => {
   }
 });
 
+test("parses the login route without treating it as application home", () => {
+  assert.deepEqual(parseRoute("/login"), { page: "login", bookId: null, success: null });
+});
+
 test("preserves an allow-listed collection return route", () => {
   assert.equal(withReturnTo("/library/3", "/favorites"), "/library/3?from=%2Ffavorites");
   assert.deepEqual(parseRoute("/library/3?from=%2Ffavorites"), {

@@ -14,6 +14,7 @@ export function parseRoute(path = "/") {
   const detailMatch = pathname.match(/^\/library\/(\d+)$/);
   const collection = getFocusedCollectionByPath(pathname);
 
+  if (pathname === "/login") return { page: "login", bookId: null, success: null };
   if (pathname === "/library/new") return { page: "book-create", bookId: null, success: null };
   if (editMatch) return { page: "book-edit", bookId: Number(editMatch[1]), success: null, returnTo: getReturnTo(query) };
   if (detailMatch) return { page: "book-detail", bookId: Number(detailMatch[1]), success: query.get("success"), returnTo: getReturnTo(query) };
