@@ -888,6 +888,14 @@ Error → retry/message
 
 Do not leave users with blank screens.
 
+## Completion status
+
+* [x] Library loading, success, empty, and error states
+* [x] Book detail loading, success, not-found, and error states
+* [x] Create/edit validation, loading, error, and success feedback
+* [x] Favorite, reading-status, and deletion mutation feedback
+* [x] Authentication validation, loading, error, and authenticated states
+
 ---
 
 # Phase 11 — Accessibility
@@ -896,16 +904,16 @@ Accessibility is part of implementation, not a final optional step.
 
 Ensure:
 
-* [ ] Semantic HTML
-* [ ] Keyboard navigation
-* [ ] Visible focus states
-* [ ] Accessible labels
-* [ ] Appropriate button names
-* [ ] Form labels
-* [ ] Dialog accessibility
-* [ ] Sufficient color contrast
-* [ ] Images have appropriate alt text
-* [ ] Interactive elements are usable without a mouse
+* [x] Semantic HTML
+* [x] Keyboard navigation
+* [x] Visible focus states
+* [x] Accessible labels
+* [x] Appropriate button names
+* [x] Form labels
+* [x] Dialog accessibility
+* [x] Sufficient color contrast
+* [x] Images have appropriate alt text
+* [x] Interactive elements are usable without a mouse
 
 Warm colors must never compromise readability.
 
@@ -1243,7 +1251,7 @@ A frontend feature is considered complete only when:
 
 ## Final Polish
 
-* [ ] Accessibility pass
+* [x] Accessibility pass
 * [ ] Visual consistency pass
 * [ ] UX pass
 * [ ] Performance pass
