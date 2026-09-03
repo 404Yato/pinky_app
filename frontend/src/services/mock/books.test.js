@@ -193,9 +193,11 @@ describe("mock book mutations", () => {
   });
 
   test("rejects invalid writes with actionable error codes", async () => {
+    const original = await getBook(1);
     await assert.rejects(() => createBook({ title: "  " }), { code: "TITLE_REQUIRED" });
     await assert.rejects(() => createBook({ title: "Libro", pages: -2 }), { code: "INVALID_PAGES" });
     await assert.rejects(() => updateReadingStatus(1, "abandoned"), { code: "INVALID_READING_STATUS" });
+    assert.deepEqual(await getBook(1), original);
   });
 
   test("reset restores the immutable seed collection", async () => {

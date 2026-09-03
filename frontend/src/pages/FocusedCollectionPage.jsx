@@ -5,6 +5,7 @@ import { BookFilters } from "@/components/books/BookFilters";
 import { BookGrid } from "@/components/books/BookGrid";
 import { LibraryEmptyState, LibraryErrorState } from "@/components/books/LibraryState";
 import { LoadingBookGrid } from "@/components/books/LoadingBookGrid";
+import { StatusNotice } from "@/components/feedback/StatusNotice";
 import { DEFAULT_BOOK_QUERY } from "@/constants/books";
 import { useBooks } from "@/hooks/useBooks";
 
@@ -15,7 +16,7 @@ const collectionIcons = {
   pending: Clock,
 };
 
-export function FocusedCollectionPage({ collection, onSelectBook }) {
+export function FocusedCollectionPage({ collection, onSelectBook, successMessage, onDismissSuccess }) {
   const [filters, setFilters] = useState(() => ({ ...DEFAULT_BOOK_QUERY, ...collection.query }));
   const deferredSearch = useDeferredValue(filters.search);
   const query = useMemo(() => ({ ...filters, ...collection.query, search: deferredSearch }), [collection, filters, deferredSearch]);
@@ -33,6 +34,7 @@ export function FocusedCollectionPage({ collection, onSelectBook }) {
 
   return (
     <div>
+      {successMessage && <StatusNotice onDismiss={onDismissSuccess} className="mb-6">{successMessage}</StatusNotice>}
       <header className="mb-8 max-w-3xl">
         <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-primary">
           <Icon aria-hidden="true" className="size-4" weight="duotone" /> {collection.eyebrow}

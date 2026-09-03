@@ -6,10 +6,11 @@ import { BookGrid } from "@/components/books/BookGrid";
 import { LibraryEmptyState, LibraryErrorState } from "@/components/books/LibraryState";
 import { LoadingBookGrid } from "@/components/books/LoadingBookGrid";
 import { Button } from "@/components/ui/button";
+import { StatusNotice } from "@/components/feedback/StatusNotice";
 import { DEFAULT_BOOK_QUERY } from "@/constants/books";
 import { useBooks } from "@/hooks/useBooks";
 
-export function LibraryPage({ onSelectBook, onCreateBook }) {
+export function LibraryPage({ onSelectBook, onCreateBook, successMessage, onDismissSuccess }) {
   const [filters, setFilters] = useState({ ...DEFAULT_BOOK_QUERY });
   const deferredSearch = useDeferredValue(filters.search);
   const query = useMemo(() => ({ ...filters, search: deferredSearch }), [filters, deferredSearch]);
@@ -25,6 +26,7 @@ export function LibraryPage({ onSelectBook, onCreateBook }) {
 
   return (
     <div>
+      {successMessage && <StatusNotice onDismiss={onDismissSuccess} className="mb-6">{successMessage}</StatusNotice>}
       <header className="mb-7 flex flex-col items-stretch justify-between gap-5 sm:mb-8 sm:flex-row sm:items-end">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Tu colección</p>

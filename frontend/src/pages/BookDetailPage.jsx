@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ArrowLeft, CheckCircle, Heart, PencilSimple, Trash, WarningCircle } from "@phosphor-icons/react";
+import { ArrowLeft, Heart, PencilSimple, Trash, WarningCircle } from "@phosphor-icons/react";
 
 import { BookCover } from "@/components/books/BookCover";
 import { BookDetailSkeleton } from "@/components/books/BookDetailSkeleton";
 import { BookStatus } from "@/components/books/BookStatus";
 import { DeleteBookDialog } from "@/components/books/DeleteBookDialog";
 import { Button } from "@/components/ui/button";
+import { StatusNotice } from "@/components/feedback/StatusNotice";
 import { READING_STATUS } from "@/constants/books";
 import { useBook } from "@/hooks/useBook";
 import { toggleFavorite, updateReadingStatus } from "@/services/mock/books";
@@ -24,11 +25,12 @@ function DetailState({ notFound, onBack, onRetry }) {
   );
 }
 
-export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessage }) {
+export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessage, onDismissSuccess }) {
   const { book, setBook, status, retry } = useBook(bookId);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [actionError, setActionError] = useState("");
-  const [updating, setUpdating] = useState(false);
+  const [actionSuccess, setActionSuccess] = useState("");
+  const [updatingAction, setUpdatingAction] = useState(null);
 
   if (status === "loading") return <BookDetailSkeleton />;
   if (status === "not-found") return <DetailState notFound onBack={onBack} />;
@@ -36,26 +38,32 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
   if (!book) return null;
 
   const handleFavorite = async () => {
-    setUpdating(true);
+    setUpdatingAction("favorite");
     setActionError("");
+    setActionSuccess("");
     try {
-      setBook(await toggleFavorite(book.id));
+      const updatedBook = await toggleFavorite(book.id);
+      setBook(updatedBook);
+      setActionSuccess(updatedBook.favorite ? "Libro agregado a tus favoritos." : "Libro eliminado de tus favoritos.");
     } catch {
       setActionError("No pudimos actualizar el favorito.");
     } finally {
-      setUpdating(false);
+      setUpdatingAction(null);
     }
   };
 
   const handleStatus = async (event) => {
-    setUpdating(true);
+    setUpdatingAction("status");
     setActionError("");
+    setActionSuccess("");
     try {
-      setBook(await updateReadingStatus(book.id, event.target.value));
+      const updatedBook = await updateReadingStatus(book.id, event.target.value);
+      setBook(updatedBook);
+      setActionSuccess("Estado de lectura actualizado.");
     } catch {
       setActionError("No pudimos actualizar el estado de lectura.");
     } finally {
-      setUpdating(false);
+      setUpdatingAction(null);
     }
   };
 
@@ -70,11 +78,10 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
   return (
     <div>
       {successMessage && (
-        <div role="status" className="mb-6 flex items-start gap-3 rounded-md border border-[#b9c8aa] bg-[#e4eadc] px-4 py-3 text-sm font-medium text-[#46543b]">
-          <CheckCircle aria-hidden="true" className="mt-0.5 size-5 shrink-0" weight="fill" />
-          {successMessage}
-        </div>
+        <StatusNotice onDismiss={onDismissSuccess} className="mb-6">{successMessage}</StatusNotice>
       )}
+      {actionSuccess && <StatusNotice onDismiss={() => setActionSuccess("")} className="mb-6">{actionSuccess}</StatusNotice>}
+      {actionError && <StatusNotice variant="error" onDismiss={() => setActionError("")} className="mb-6">{actionError}</StatusNotice>}
       <button type="button" onClick={onBack} className="mb-7 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-primary hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <ArrowLeft aria-hidden="true" className="size-4" /> Volver a la biblioteca
       </button>
@@ -87,26 +94,26 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
         <div className="min-w-0 py-1">
           <div className="flex flex-wrap items-center gap-3">
             <BookStatus status={book.readingStatus} />
-            {book.favorite && <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent"><Heart aria-hidden="true" className="size-4" weight="fill" /> Favorito</span>}
+            {book.favorite && <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary"><Heart aria-hidden="true" className="size-4" weight="fill" /> Favorito</span>}
           </div>
           <h1 className="mt-5 break-words font-heading text-3xl font-semibold leading-tight tracking-tight text-foreground min-[380px]:text-4xl xl:text-5xl">{book.title}</h1>
           <p className="mt-3 text-lg text-muted-foreground sm:text-xl">{book.author || "Autor desconocido"}</p>
 
           <div className="mt-7 flex flex-col gap-3 border-y border-border py-5 min-[420px]:flex-row min-[420px]:flex-wrap">
-            <Button type="button" onClick={onEdit} variant="outline" className="h-11 w-full gap-2 px-4 text-sm min-[420px]:w-auto"><PencilSimple aria-hidden="true" /> Editar</Button>
-            <Button type="button" onClick={handleFavorite} disabled={updating} variant={book.favorite ? "secondary" : "outline"} className="h-11 w-full gap-2 px-4 text-sm min-[420px]:w-auto"><Heart aria-hidden="true" weight={book.favorite ? "fill" : "regular"} /> {book.favorite ? "Quitar favorito" : "Marcar favorito"}</Button>
-            <Button type="button" onClick={() => setDeleteOpen(true)} variant="destructive" className="h-11 w-full gap-2 px-4 text-sm min-[420px]:w-auto"><Trash aria-hidden="true" /> Eliminar</Button>
+            <Button type="button" onClick={onEdit} disabled={Boolean(updatingAction)} variant="outline" className="h-11 w-full gap-2 px-4 text-sm min-[420px]:w-auto"><PencilSimple aria-hidden="true" /> Editar</Button>
+            <Button type="button" onClick={handleFavorite} disabled={Boolean(updatingAction)} aria-busy={updatingAction === "favorite"} variant={book.favorite ? "secondary" : "outline"} className="h-11 w-full gap-2 px-4 text-sm min-[420px]:w-auto"><Heart aria-hidden="true" weight={book.favorite ? "fill" : "regular"} /> {updatingAction === "favorite" ? "Guardando…" : book.favorite ? "Quitar favorito" : "Marcar favorito"}</Button>
+            <Button type="button" onClick={() => setDeleteOpen(true)} disabled={Boolean(updatingAction)} variant="destructive" className="h-11 w-full gap-2 px-4 text-sm min-[420px]:w-auto"><Trash aria-hidden="true" /> Eliminar</Button>
           </div>
 
           <div className="mt-7 w-full sm:max-w-xs">
             <label htmlFor="reading-status" className="text-sm font-semibold text-foreground">Estado de lectura</label>
-            <select id="reading-status" value={book.readingStatus} onChange={handleStatus} disabled={updating} className="mt-2 h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20">
+            <select id="reading-status" value={book.readingStatus} onChange={handleStatus} disabled={Boolean(updatingAction)} aria-busy={updatingAction === "status"} className="mt-2 h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20">
               <option value={READING_STATUS.PENDING}>Pendiente</option>
               <option value={READING_STATUS.READING}>Leyendo</option>
               <option value={READING_STATUS.READ}>Leído</option>
             </select>
           </div>
-          {actionError && <p role="alert" className="mt-3 text-sm text-destructive">{actionError}</p>}
+          <p className="sr-only" role="status" aria-live="polite">{updatingAction ? "Guardando cambios del libro." : ""}</p>
 
           <section aria-labelledby="description-title" className="mt-10">
             <h2 id="description-title" className="font-heading text-2xl font-semibold">Sobre este libro</h2>
