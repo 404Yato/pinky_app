@@ -1,26 +1,42 @@
-import { Books, Coffee } from "@phosphor-icons/react";
+import { useMemo } from "react";
 
-export function HomePage() {
+import { DashboardBookSection } from "@/components/dashboard/DashboardBookSection";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { DashboardEmptyState, DashboardErrorState, DashboardLoadingState } from "@/components/dashboard/DashboardState";
+import { LibraryStats } from "@/components/dashboard/LibraryStats";
+import { ReadingProgress } from "@/components/dashboard/ReadingProgress";
+import { useBooks } from "@/hooks/useBooks";
+import { getDashboardSections, getLibraryStats, getReadingProgress } from "@/lib/dashboard";
+
+export function HomePage({ onBrowse, onCreateBook, onSelectBook }) {
+  const { books, status, retry } = useBooks();
+  const dashboard = useMemo(() => ({
+    stats: getLibraryStats(books),
+    sections: getDashboardSections(books),
+    progress: getReadingProgress(books),
+  }), [books]);
+
+  if (status === "loading") return <DashboardLoadingState />;
+  if (status === "error") return <DashboardErrorState onRetry={retry} />;
+
   return (
-    <>
-      <section aria-labelledby="welcome-title" className="max-w-3xl">
-        <p className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-primary">
-          <Coffee aria-hidden="true" className="size-4" weight="duotone" />
-          Tu rincón de lectura
-        </p>
-        <h1 id="welcome-title" className="font-heading text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl">Bienvenido a tu biblioteca.</h1>
-        <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">Pinky será el lugar donde podrás descubrir, organizar y volver a cada historia que forma parte de ti.</p>
-      </section>
-
-      <section aria-labelledby="library-preview-title" className="mt-12 border-t border-border pt-10 sm:mt-16 sm:pt-12">
-        <div className="flex max-w-3xl items-start gap-4 rounded-lg border border-border bg-card p-5 sm:p-7">
-          <span className="grid size-12 shrink-0 place-items-center rounded-md bg-secondary text-primary"><Books aria-hidden="true" className="size-6" weight="duotone" /></span>
-          <div>
-            <h2 id="library-preview-title" className="font-heading text-xl font-semibold text-card-foreground sm:text-2xl">Tu colección empieza aquí</h2>
-            <p className="mt-2 text-sm leading-7 text-muted-foreground sm:text-base">Explora tu biblioteca para reencontrarte con las historias que has reunido.</p>
+    <div>
+      <DashboardHeader onBrowse={onBrowse} onCreateBook={onCreateBook} />
+      {books.length === 0 ? (
+        <div className="mt-12"><DashboardEmptyState onCreateBook={onCreateBook} /></div>
+      ) : (
+        <>
+          <LibraryStats stats={dashboard.stats} />
+          <div className="mt-10 grid gap-10 sm:mt-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+            <DashboardBookSection id="recent-books-title" title="Recién llegados" description="Las últimas historias que sumaste a tus estantes." books={dashboard.sections.recent} emptyMessage="Tus próximos libros aparecerán aquí." onSelectBook={onSelectBook} onBrowse={onBrowse} />
+            <ReadingProgress progress={dashboard.progress} />
           </div>
-        </div>
-      </section>
-    </>
+          <div className="mt-12 space-y-12">
+            <DashboardBookSection id="reading-books-title" title="Leyendo ahora" description="Historias en las que dejaste un marcador." books={dashboard.sections.reading} emptyMessage="No tienes lecturas en curso. Cuando empieces una, la encontrarás aquí." onSelectBook={onSelectBook} onBrowse={onBrowse} />
+            <DashboardBookSection id="favorite-books-title" title="Tus favoritos" description="Libros a los que siempre quieres volver." books={dashboard.sections.favorites} emptyMessage="Marca como favorita una historia especial para tenerla siempre cerca." onSelectBook={onSelectBook} onBrowse={onBrowse} />
+          </div>
+        </>
+      )}
+    </div>
   );
 }
