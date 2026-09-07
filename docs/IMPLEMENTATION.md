@@ -774,6 +774,8 @@ Create the authentication experience visually without implementing backend authe
 
 * [x] Login page
 * [x] Login form
+* [x] Registration page and form
+* [x] Registration API integration and validation feedback
 * [x] Password field
 * [x] Validation
 * [x] Loading state
@@ -976,13 +978,11 @@ Do not add decorative elements merely because they are visually interesting.
 
 ---
 
-# 13. API Integration — Future Phase
+# 13. API Integration
 
-API integration is intentionally postponed.
+API integration is implemented in the frontend against the existing read-only Django REST API.
 
-The project owner will implement and test this separately.
-
-The future architecture should conceptually become:
+The architecture is:
 
 ```text
 UI
@@ -996,9 +996,7 @@ Django REST Framework
 PostgreSQL
 ```
 
-The current mock layer should make this transition straightforward.
-
-When API integration begins, the goal should be to replace:
+The production flow replaces:
 
 ```text
 Mock service
@@ -1010,9 +1008,7 @@ with:
 API service
 ```
 
-without requiring a major rewrite of the UI components.
-
-The agent must NOT implement this phase during the current frontend-only development period.
+without requiring a major rewrite of the UI components. Mock book data remains isolated for automated tests and development fixtures.
 
 ---
 
@@ -1260,17 +1256,27 @@ A frontend feature is considered complete only when:
 
 ## Future — API Integration
 
-* [ ] Replace mock book service
-* [ ] Connect library endpoints
-* [ ] Connect book details
-* [ ] Connect create/edit/delete
-* [ ] Connect favorites
-* [ ] Connect reading status
-* [ ] Connect authentication
-* [ ] Test API error handling
-* [ ] Remove mock services where appropriate
+* [x] Replace mock book service
+* [x] Connect library endpoints
+* [x] Connect book details
+* [x] Connect create/edit/delete
+* [x] Connect favorites
+* [x] Connect reading status
+* [x] Connect authentication
+* [x] Test API error handling
+* [x] Remove mock services where appropriate
 
-This section must NOT be implemented during the current frontend-only phase.
+The production frontend now uses the Django REST API through a centralized JWT-aware client and maps API records into `BookViewModel`. Book mock fixtures remain isolated for tests.
+
+Current read-only backend compatibility notes:
+
+* Item listings omit type-specific details, so the frontend hydrates each book through the item-detail endpoint.
+* Book creation does not persist `favorite`; the frontend applies a follow-up update when necessary.
+* Create and update responses omit details, so the frontend retrieves the canonical item after mutations.
+* Login uses Django `username`, not email.
+* Development uses the Vite `/api` proxy because the backend does not expose cross-origin headers.
+
+The backend remains read-only; compatibility workarounds belong in the frontend integration layer.
 
 ---
 
