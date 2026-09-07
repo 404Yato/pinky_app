@@ -1,8 +1,5 @@
 from .base import *
 
-DEBUG = False
-
-
 # Seguridad básica
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
