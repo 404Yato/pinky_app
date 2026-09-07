@@ -182,11 +182,11 @@ class ItemDetailView(APIView):
     )
     def put(self, request, id):
 
-        item_data = update_item(id, request.user, request.data)
+        item = update_item(id, request.user, request.data)
 
         response_data = {
                 "message" : f"Item {id} updated successfully.",
-                "data" : item_data
+                "data" : item
             }
         
         response = ItemResponseSerializer(response_data)
@@ -216,11 +216,11 @@ class ItemDetailView(APIView):
     )
     def delete(self, request, id):
 
-        item_data = delete_item(id, request.user)
+        item = delete_item(id, request.user)
 
         response_data = {
                 "message" : f"Item {id} soft deleted successfully",
-                "data" : item_data
+                "data" : item
             }
         
         response = ItemResponseSerializer(response_data)

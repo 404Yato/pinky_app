@@ -104,7 +104,7 @@ def update_item(pk, user, data):
             details_data
         )
 
-    return serializers.ItemSerializer(item).data
+    return item
 
 def delete_item(pk, user):
 
@@ -118,7 +118,7 @@ def delete_item(pk, user):
 
     item.save(update_fields=["deleted_at"])
 
-    return serializers.ItemSerializer(item).data
+    return item
 
 def get_item_details(item):
     # Resolve the item's detail record using the configured detail serializer map.
