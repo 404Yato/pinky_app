@@ -60,7 +60,7 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
     try {
       await onSubmit(values);
     } catch (error) {
-      setSubmitError(error?.message || "No pudimos guardar el libro. Intenta nuevamente.");
+      setSubmitError(error?.code === "VALIDATION_ERROR" ? "Revisa los datos del libro e intenta nuevamente." : "No pudimos guardar el libro. Intenta nuevamente.");
     } finally {
       setSubmitting(false);
     }

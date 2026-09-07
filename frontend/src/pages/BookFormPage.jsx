@@ -4,7 +4,7 @@ import { BookDetailSkeleton } from "@/components/books/BookDetailSkeleton";
 import { BookForm } from "@/components/books/BookForm";
 import { Button } from "@/components/ui/button";
 import { useBook } from "@/hooks/useBook";
-import { createBook, updateBook } from "@/services/mock/books";
+import { createBook, updateBook } from "@/services/api/books";
 
 export function BookFormPage({ bookId = null, onCancel, onSaved }) {
   const editing = bookId !== null;
@@ -25,7 +25,7 @@ export function BookFormPage({ bookId = null, onCancel, onSaved }) {
   }
 
   const handleSubmit = async (values) => {
-    const savedBook = editing ? await updateBook(bookId, values) : await createBook(values);
+    const savedBook = editing ? await updateBook(bookId, values, book) : await createBook(values);
     onSaved(savedBook, editing ? "updated" : "created");
   };
 

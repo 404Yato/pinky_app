@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { getBooks } from "@/services/mock/books";
+import { getBooks } from "@/services/api/books";
 
 export function useBooks(query) {
   const [books, setBooks] = useState([]);

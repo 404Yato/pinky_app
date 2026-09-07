@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { StatusNotice } from "@/components/feedback/StatusNotice";
 import { READING_STATUS } from "@/constants/books";
 import { useBook } from "@/hooks/useBook";
-import { toggleFavorite, updateReadingStatus } from "@/services/mock/books";
+import { toggleFavorite, updateReadingStatus } from "@/services/api/books";
 
 function DetailState({ notFound, onBack, onRetry }) {
   return (
@@ -42,7 +42,7 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
     setActionError("");
     setActionSuccess("");
     try {
-      const updatedBook = await toggleFavorite(book.id);
+      const updatedBook = await toggleFavorite(book.id, book);
       setBook(updatedBook);
       setActionSuccess(updatedBook.favorite ? "Libro agregado a tus favoritos." : "Libro eliminado de tus favoritos.");
     } catch {
@@ -57,7 +57,7 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
     setActionError("");
     setActionSuccess("");
     try {
-      const updatedBook = await updateReadingStatus(book.id, event.target.value);
+      const updatedBook = await updateReadingStatus(book.id, event.target.value, book);
       setBook(updatedBook);
       setActionSuccess("Estado de lectura actualizado.");
     } catch {

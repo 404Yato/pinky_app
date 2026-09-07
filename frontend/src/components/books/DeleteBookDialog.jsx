@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Trash } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
-import { deleteBook } from "@/services/mock/books";
+import { deleteBook } from "@/services/api/books";
 
 export function DeleteBookDialog({ book, open, onClose, onDeleted }) {
   const dialogRef = useRef(null);
@@ -25,7 +25,7 @@ export function DeleteBookDialog({ book, open, onClose, onDeleted }) {
     setDeleting(true);
     setError("");
     try {
-      await deleteBook(book.id);
+      await deleteBook(book.id, book);
       onClose();
       onDeleted();
     } catch {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { getBook } from "@/services/mock/books";
+import { getBook } from "@/services/api/books";
 
 export function useBook(bookId, { enabled = true } = {}) {
   const [book, setBook] = useState(null);

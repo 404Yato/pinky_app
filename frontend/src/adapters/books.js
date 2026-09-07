@@ -1,4 +1,5 @@
 import { READING_STATUS } from "../constants/books.js";
+import { ITEM_TYPE_ID } from "../constants/items.js";
 
 const nullableString = (value) => {
   if (value === undefined || value === null) return null;
@@ -84,4 +85,67 @@ export function bookFormToUpdateCommand(values) {
   }
 
   return { item, book };
+}
+
+export function bookApiResponseToRecord(response) {
+  const { details = {}, ...item } = response ?? {};
+  return {
+    item: {
+      ...item,
+      description: item.description ?? "",
+      favorite: Boolean(item.favorite),
+      deleted_at: item.deleted_at ?? null,
+    },
+    book: {
+      item: details.item ?? item.id,
+      isbn: details.isbn ?? null,
+      author: details.author ?? null,
+      publisher: details.publisher ?? null,
+      pages: details.pages ?? null,
+      publication_year: details.publication_year ?? null,
+      genre: details.genre ?? null,
+      cover_url: details.cover_url ?? null,
+      reading_status: details.reading_status ?? READING_STATUS.PENDING,
+    },
+  };
+}
+
+export function bookApiResponseToViewModel(response) {
+  return bookRecordToViewModel(bookApiResponseToRecord(response));
+}
+
+export function bookCreateCommandToApiPayload(command) {
+  return {
+    item_type: ITEM_TYPE_ID.BOOK,
+    ...command.item,
+    details: command.book,
+  };
+}
+
+export function bookUpdateCommandToApiPayload(command) {
+  return { ...command.item, details: command.book };
+}
+
+const commandValue = (values, field, fallback) => Object.hasOwn(values, field) ? values[field] : fallback;
+
+export function bookMutationResponseToViewModel(currentBook, command, response) {
+  const item = response?.data ?? response ?? {};
+  const current = currentBook ?? {};
+  return {
+    id: item.id ?? current.id,
+    title: item.name ?? commandValue(command.item, "name", current.title),
+    description: item.description ?? commandValue(command.item, "description", current.description ?? ""),
+    favorite: item.favorite ?? commandValue(command.item, "favorite", current.favorite ?? false),
+    createdAt: item.created_at ?? current.createdAt ?? null,
+    updatedAt: item.updated_at ?? current.updatedAt ?? null,
+    deletedAt: item.deleted_at ?? current.deletedAt ?? null,
+    author: commandValue(command.book, "author", current.author ?? null),
+    isbn: commandValue(command.book, "isbn", current.isbn ?? null),
+    publisher: commandValue(command.book, "publisher", current.publisher ?? null),
+    pages: commandValue(command.book, "pages", current.pages ?? null),
+    publicationYear: commandValue(command.book, "publication_year", current.publicationYear ?? null),
+    genre: commandValue(command.book, "genre", current.genre ?? null),
+    coverUrl: commandValue(command.book, "cover_url", current.coverUrl ?? null),
+    readingStatus: commandValue(command.book, "reading_status", current.readingStatus ?? READING_STATUS.PENDING),
+  };
 }
