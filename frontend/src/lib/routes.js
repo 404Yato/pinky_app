@@ -2,10 +2,16 @@ import { getFocusedCollectionByPath } from "../config/collections.js";
 
 const SAFE_RETURN_PATHS = new Set(["/library", "/favorites", "/read", "/reading", "/pending"]);
 const SUCCESS_VALUES = new Set(["created", "updated", "deleted"]);
+const AUTH_SUCCESS_VALUES = new Set(["registered"]);
 
 function getSuccess(query) {
   const success = query.get("success");
   return SUCCESS_VALUES.has(success) ? success : null;
+}
+
+function getAuthSuccess(query) {
+  const success = query.get("success");
+  return AUTH_SUCCESS_VALUES.has(success) ? success : null;
 }
 
 function getReturnTo(query) {
@@ -20,7 +26,8 @@ export function parseRoute(path = "/") {
   const detailMatch = pathname.match(/^\/library\/(\d+)$/);
   const collection = getFocusedCollectionByPath(pathname);
 
-  if (pathname === "/login") return { page: "login", bookId: null, success: null };
+  if (pathname === "/login") return { page: "login", bookId: null, success: getAuthSuccess(query) };
+  if (pathname === "/register") return { page: "register", bookId: null, success: null };
   if (pathname === "/library/new") return { page: "book-create", bookId: null, success: null };
   if (editMatch) return { page: "book-edit", bookId: Number(editMatch[1]), success: null, returnTo: getReturnTo(query) };
   if (detailMatch) return { page: "book-detail", bookId: Number(detailMatch[1]), success: getSuccess(query), returnTo: getReturnTo(query) };
@@ -45,6 +52,13 @@ export function withSuccess(path, success) {
   const query = new URLSearchParams(queryString);
   query.set("success", success);
   return `${pathname}?${query.toString()}`;
+}
+
+export function withAuthSuccess(path, success) {
+  if (!AUTH_SUCCESS_VALUES.has(success)) return path;
+  const query = new URLSearchParams();
+  query.set("success", success);
+  return `${path}?${query.toString()}`;
 }
 
 export function navigateTo(path) {

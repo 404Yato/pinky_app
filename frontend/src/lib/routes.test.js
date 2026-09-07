@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseRoute, withReturnTo, withSuccess } from "./routes.js";
+import { parseRoute, withAuthSuccess, withReturnTo, withSuccess } from "./routes.js";
 
 test("parses each focused collection route", () => {
   for (const collectionId of ["favorites", "read", "reading", "pending"]) {
@@ -11,6 +11,13 @@ test("parses each focused collection route", () => {
 
 test("parses the login route without treating it as application home", () => {
   assert.deepEqual(parseRoute("/login"), { page: "login", bookId: null, success: null });
+});
+
+test("supports public registration and registration success navigation", () => {
+  assert.deepEqual(parseRoute("/register"), { page: "register", bookId: null, success: null });
+  const loginPath = withAuthSuccess("/login", "registered");
+  assert.equal(loginPath, "/login?success=registered");
+  assert.deepEqual(parseRoute(loginPath), { page: "login", bookId: null, success: "registered" });
 });
 
 test("preserves an allow-listed collection return route", () => {

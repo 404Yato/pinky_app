@@ -1,6 +1,6 @@
 export function normalizeLoginValues(values = {}) {
   return {
-    email: String(values.email ?? "").trim().toLocaleLowerCase("es"),
+    username: String(values.username ?? "").trim(),
     password: String(values.password ?? ""),
   };
 }
@@ -9,11 +9,7 @@ export function validateLoginValues(values = {}) {
   const normalized = normalizeLoginValues(values);
   const errors = {};
 
-  if (!normalized.email) {
-    errors.email = "Escribe tu correo electrónico.";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized.email)) {
-    errors.email = "Ingresa un correo electrónico válido.";
-  }
+  if (!normalized.username) errors.username = "Escribe tu nombre de usuario.";
 
   if (!normalized.password) errors.password = "Escribe tu contraseña.";
 

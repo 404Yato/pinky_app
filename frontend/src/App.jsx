@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { AuthLoadingState } from "@/components/auth/AuthLoadingState";
 import { getFocusedCollection, getFocusedCollectionByPath } from "@/config/collections";
-import { navigateTo, readRoute, withReturnTo, withSuccess } from "@/lib/routes";
+import { navigateTo, readRoute, withAuthSuccess, withReturnTo, withSuccess } from "@/lib/routes";
 import { useAuth } from "@/hooks/useAuth";
 import { HomePage } from "@/pages/HomePage";
 import { BookDetailPage } from "@/pages/BookDetailPage";
@@ -10,10 +11,11 @@ import { BookFormPage } from "@/pages/BookFormPage";
 import { LibraryPage } from "@/pages/LibraryPage";
 import { FocusedCollectionPage } from "@/pages/FocusedCollectionPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { RegisterPage } from "@/pages/RegisterPage";
 
 function App() {
   const [route, setRoute] = useState(readRoute);
-  const { user, authenticated, login, logout } = useAuth();
+  const { user, authenticated, status: authStatus, login, logout, register, retry: retryAuth } = useAuth();
   const isLibrary = route.page === "library";
   const isBookDetail = route.page === "book-detail";
   const isBookForm = route.page === "book-create" || route.page === "book-edit";
@@ -29,18 +31,27 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (authenticated && route.page === "login") navigateTo("/");
+    if (authenticated && (route.page === "login" || route.page === "register")) navigateTo("/");
   }, [authenticated, route.page]);
 
+  if (authStatus === "loading") return <AuthLoadingState />;
+  if (authStatus === "error") return <AuthLoadingState error onRetry={retryAuth} />;
+
   if (!authenticated) {
-    return <LoginPage onLogin={async (credentials) => {
+    if (route.page === "register") {
+      return <RegisterPage onRegister={async (values) => {
+        await register(values);
+        navigateTo(withAuthSuccess("/login", "registered"));
+      }} />;
+    }
+    return <LoginPage successMessage={route.success === "registered" ? "Cuenta creada correctamente. Ya puedes iniciar sesión." : null} onDismissSuccess={() => navigateTo("/login")} onLogin={async (credentials) => {
       await login(credentials);
       if (route.page === "login") navigateTo("/");
     }} />;
   }
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigateTo("/login");
   };
 

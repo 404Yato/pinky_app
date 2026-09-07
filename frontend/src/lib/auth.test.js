@@ -3,15 +3,14 @@ import test from "node:test";
 
 import { normalizeLoginValues, validateLoginValues } from "./auth.js";
 
-test("normalizes login email without altering the password", () => {
-  assert.deepEqual(normalizeLoginValues({ email: "  CRISTIAN@PINKY.APP ", password: "  secret  " }), {
-    email: "cristian@pinky.app",
+test("normalizes login username without altering the password", () => {
+  assert.deepEqual(normalizeLoginValues({ username: "  reader_01 ", password: "  secret  " }), {
+    username: "reader_01",
     password: "  secret  ",
   });
 });
 
-test("validates required login fields and email format", () => {
-  assert.deepEqual(Object.keys(validateLoginValues({}).errors).sort(), ["email", "password"]);
-  assert.equal(validateLoginValues({ email: "not-an-email", password: "secret" }).errors.email, "Ingresa un correo electrónico válido.");
-  assert.equal(validateLoginValues({ email: "reader@example.com", password: "secret" }).valid, true);
+test("validates required login fields", () => {
+  assert.deepEqual(Object.keys(validateLoginValues({}).errors).sort(), ["password", "username"]);
+  assert.equal(validateLoginValues({ username: "reader", password: "secret" }).valid, true);
 });

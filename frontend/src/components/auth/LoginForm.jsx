@@ -6,9 +6,9 @@ import { validateLoginValues } from "@/lib/auth";
 
 const inputClassName = "mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/70 focus:border-ring focus:ring-2 focus:ring-ring/20 aria-invalid:border-destructive aria-invalid:ring-destructive/20";
 
-export function LoginForm({ onSubmit, initialEmail = "" }) {
+export function LoginForm({ onSubmit }) {
   const formRef = useRef(null);
-  const [values, setValues] = useState({ email: initialEmail, password: "" });
+  const [values, setValues] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -36,7 +36,7 @@ export function LoginForm({ onSubmit, initialEmail = "" }) {
     try {
       await onSubmit(validation.values);
     } catch (error) {
-      setSubmitError(error?.code === "INVALID_CREDENTIALS" ? "El correo o la contraseña no coinciden. Revisa los datos de acceso." : "No pudimos iniciar la sesión de demostración. Intenta nuevamente.");
+      setSubmitError(error?.code === "INVALID_CREDENTIALS" ? "El usuario o la contraseña no coinciden. Revisa los datos de acceso." : "No pudimos iniciar sesión. Comprueba tu conexión e intenta nuevamente.");
     } finally {
       setSubmitting(false);
     }
@@ -46,9 +46,9 @@ export function LoginForm({ onSubmit, initialEmail = "" }) {
     <form ref={formRef} onSubmit={handleSubmit} noValidate aria-busy={submitting} className="mt-8 space-y-5">
       {Object.keys(errors).length > 0 && <p role="alert" className="sr-only">Revisa los campos indicados antes de continuar.</p>}
       <label className="block text-sm font-semibold text-foreground">
-        Correo electrónico
-        <input type="email" autoComplete="email" autoFocus required aria-required="true" value={values.email} onChange={(event) => updateField("email", event.target.value)} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? "login-email-error" : undefined} className={inputClassName} placeholder="tu@correo.com" />
-        {errors.email && <span id="login-email-error" className="mt-1.5 block text-xs font-normal text-destructive">{errors.email}</span>}
+        Nombre de usuario
+        <input type="text" autoComplete="username" autoFocus required aria-required="true" value={values.username} onChange={(event) => updateField("username", event.target.value)} aria-invalid={Boolean(errors.username)} aria-describedby={errors.username ? "login-username-error" : undefined} className={inputClassName} placeholder="tu_usuario" />
+        {errors.username && <span id="login-username-error" className="mt-1.5 block text-xs font-normal text-destructive">{errors.username}</span>}
       </label>
 
       <label className="block text-sm font-semibold text-foreground">

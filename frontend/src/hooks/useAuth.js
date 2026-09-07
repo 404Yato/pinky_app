@@ -1,32 +1,48 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { login as mockLogin } from "@/services/mock/auth";
-
-const SESSION_KEY = "pinky.mock-session";
-
-function readSession() {
-  try {
-    const value = window.sessionStorage.getItem(SESSION_KEY);
-    return value ? JSON.parse(value) : null;
-  } catch {
-    return null;
-  }
-}
+import { login as apiLogin, logout as apiLogout, register as apiRegister, restoreSession } from "@/services/api/auth";
+import { getTokens, subscribeToAuthChanges } from "@/lib/api/tokens";
 
 export function useAuth() {
-  const [user, setUser] = useState(readSession);
+  const [user, setUser] = useState(null);
+  const [status, setStatus] = useState("loading");
+  const [requestVersion, setRequestVersion] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    setStatus("loading");
+    restoreSession()
+      .then((restoredUser) => {
+        if (!active) return;
+        setUser(restoredUser);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (active) setStatus("error");
+      });
+    const unsubscribe = subscribeToAuthChanges(() => {
+      if (!getTokens()) setUser(null);
+    });
+    return () => { active = false; unsubscribe(); };
+  }, [requestVersion]);
 
   const login = useCallback(async (credentials) => {
-    const authenticatedUser = await mockLogin(credentials);
-    window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(authenticatedUser));
+    const authenticatedUser = await apiLogin(credentials);
     setUser(authenticatedUser);
     return authenticatedUser;
   }, []);
 
-  const logout = useCallback(() => {
-    window.sessionStorage.removeItem(SESSION_KEY);
-    setUser(null);
+  const logout = useCallback(async () => {
+    try {
+      await apiLogout();
+    } finally {
+      setUser(null);
+    }
   }, []);
 
-  return { user, authenticated: Boolean(user), login, logout };
+  const register = useCallback((values) => apiRegister(values), []);
+
+  const retry = useCallback(() => setRequestVersion((version) => version + 1), []);
+
+  return { user, authenticated: Boolean(user), status, login, logout, register, retry };
 }
