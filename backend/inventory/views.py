@@ -1,11 +1,13 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from drf_spectacular.utils import (extend_schema, OpenApiResponse, OpenApiExample)
-from .serializers import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, WhoAmIResponseSerializer
+from .serializers import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, WhoAmIResponseSerializer, BookQuoteSerializer
 from .services import get_items, add_item, get_item, update_item, delete_item
+from .models import Book, BookQuote
 
 # ITEM_id_PARAMETER = OpenApiParameter(
 #         name="id",
@@ -281,3 +283,291 @@ class Health(APIView):
         }
 
         return Response(response)
+
+class BookQuoteListCreateView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["Book Quotes"],
+        summary="Obtener citas de un libro",
+        description=(
+            "Obtiene todas las citas guardadas para un libro perteneciente "
+            "al usuario autenticado. No es posible consultar citas de libros "
+            "pertenecientes a otros usuarios."
+        ),
+        responses={
+            200: BookQuoteSerializer(many=True),
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description="El libro no existe o no pertenece al usuario."
+            ),
+        },
+    )
+    def get(self, request, book_id):
+
+        book = get_object_or_404(
+            Book,
+            item__id=book_id,
+            item__user=request.user,
+            item__deleted_at__isnull=True,
+        )
+
+        quotes = BookQuote.objects.filter(
+            book=book
+        ).order_by("created_at")
+
+        serializer = BookQuoteSerializer(
+            quotes,
+            many=True
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    @extend_schema(
+        tags=["Book Quotes"],
+        summary="Crear una cita",
+        description=(
+            "Crea una nueva cita asociada a un libro perteneciente al usuario "
+            "autenticado. La página es opcional si el serializer/modelo lo permite."
+        ),
+        request=BookQuoteSerializer,
+        responses={
+            201: BookQuoteSerializer,
+            400: OpenApiResponse(
+                description="Los datos enviados no son válidos."
+            ),
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description="El libro no existe o no pertenece al usuario."
+            ),
+        },
+    )
+    def post(self, request, book_id):
+
+        book = get_object_or_404(
+            Book,
+            item__id=book_id,
+            item__user=request.user,
+            item__deleted_at__isnull=True,
+        )
+
+        serializer = BookQuoteSerializer(
+            data=request.data
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        quote = serializer.save(
+            book=book
+        )
+
+        response = BookQuoteSerializer(
+            quote
+        )
+
+        return Response(
+            response.data,
+            status=status.HTTP_201_CREATED
+        )
+
+class BookQuoteDetailView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get_quote(self, quote_id, book_id, user):
+
+        return get_object_or_404(
+            BookQuote,
+            id=quote_id,
+            book__item__id=book_id,
+            book__item__user=user,
+            book__item__deleted_at__isnull=True,
+        )
+
+    @extend_schema(
+        tags=["Book Quotes"],
+        summary="Obtener una cita",
+        description=(
+            "Obtiene una cita específica perteneciente a un libro del usuario "
+            "autenticado."
+        ),
+        responses={
+            200: BookQuoteSerializer,
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description=(
+                    "La cita no existe, el libro no existe o no pertenecen "
+                    "al usuario autenticado."
+                )
+            ),
+        },
+    )
+    def get(self, request, book_id, quote_id):
+
+        quote = self.get_quote(
+            quote_id,
+            book_id,
+            request.user
+        )
+
+        serializer = BookQuoteSerializer(
+            quote
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    @extend_schema(
+        tags=["Book Quotes"],
+        summary="Actualizar una cita",
+        description=(
+            "Actualiza una cita existente perteneciente a un libro del usuario "
+            "autenticado."
+        ),
+        request=BookQuoteSerializer,
+        responses={
+            200: BookQuoteSerializer,
+            400: OpenApiResponse(
+                description="Los datos enviados no son válidos."
+            ),
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description=(
+                    "La cita no existe, el libro no existe o no pertenecen "
+                    "al usuario autenticado."
+                )
+            ),
+        },
+    )
+    def put(self, request, book_id, quote_id):
+
+        quote = self.get_quote(
+            quote_id,
+            book_id,
+            request.user
+        )
+
+        serializer = BookQuoteSerializer(
+            quote,
+            data=request.data
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        quote = serializer.save()
+
+        response = BookQuoteSerializer(
+            quote
+        )
+
+        return Response(
+            response.data,
+            status=status.HTTP_200_OK
+        )
+
+    @extend_schema(
+        tags=["Book Quotes"],
+        summary="Actualizar parcialmente una cita",
+        description=(
+            "Actualiza parcialmente una cita perteneciente a un libro del usuario "
+            "autenticado. Permite modificar únicamente los campos enviados."
+        ),
+        request=BookQuoteSerializer,
+        responses={
+            200: BookQuoteSerializer,
+            400: OpenApiResponse(
+                description="Los datos enviados no son válidos."
+            ),
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description=(
+                    "La cita no existe, el libro no existe o no pertenecen "
+                    "al usuario autenticado."
+                )
+            ),
+        },
+    )
+    def patch(self, request, book_id, quote_id):
+
+        quote = self.get_quote(
+            quote_id,
+            book_id,
+            request.user
+        )
+
+        serializer = BookQuoteSerializer(
+            quote,
+            data=request.data,
+            partial=True
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        quote = serializer.save()
+
+        response = BookQuoteSerializer(
+            quote
+        )
+
+        return Response(
+            response.data,
+            status=status.HTTP_200_OK
+        )
+
+    @extend_schema(
+        tags=["Book Quotes"],
+        summary="Eliminar una cita",
+        description=(
+            "Elimina permanentemente una cita perteneciente a un libro "
+            "del usuario autenticado."
+        ),
+        responses={
+            204: OpenApiResponse(
+                description="La cita fue eliminada correctamente."
+            ),
+            401: OpenApiResponse(
+                description="El usuario no está autenticado."
+            ),
+            404: OpenApiResponse(
+                description=(
+                    "La cita no existe, el libro no existe o no pertenecen "
+                    "al usuario autenticado."
+                )
+            ),
+        },
+    )
+    def delete(self, request, book_id, quote_id):
+
+        quote = self.get_quote(
+            quote_id,
+            book_id,
+            request.user
+        )
+
+        quote.delete()
+
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )

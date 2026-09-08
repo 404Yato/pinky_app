@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Item, ItemType, Book, Vinyl
+from .models import Item, ItemType, Book, Vinyl, BookQuote
 
 class ItemSerializer(serializers.ModelSerializer):
     
@@ -60,3 +60,19 @@ class WhoAmIResponseSerializer(serializers.Serializer):
     email = serializers.EmailField(
         help_text="Correo electrónico del usuario."
     )
+
+class BookQuoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookQuote
+        fields = [
+            "id",
+            "text",
+            "page",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+        ]
