@@ -41,6 +41,27 @@ class Item(models.Model):
         default=False
     )
 
+    possession_status = models.CharField(
+        max_length=20,
+        choices=[
+            ("OWNED", "En mi colección"),
+            ("LOANED", "Prestado"),
+        ],
+        default="OWNED"
+    )
+
+    location = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+
+    loaned_to = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
@@ -154,3 +175,21 @@ class Vinyl(models.Model):
 
     def __str__(self):
         return self.item.name
+
+class BookQuote(models.Model):
+    book = models.ForeignKey(
+        Book,
+        on_delete=models.CASCADE,
+        related_name="quotes"
+    )
+    text = models.TextField()
+    page = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
