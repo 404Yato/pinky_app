@@ -1,3 +1,4 @@
+import { CircleNotch, MagnifyingGlass } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
 
 import { BookCover } from "@/components/books/BookCover";
@@ -6,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { READING_STATUS } from "@/constants/books";
 import { POSSESSION_STATUS, POSSESSION_STATUS_LABEL } from "@/constants/items";
 import { isValidCoverUrl } from "@/lib/bookCover";
+import { fillEmptyBookFields, isValidIsbn, normalizeIsbn } from "@/lib/isbn";
+import { getBookMetadataByISBN } from "@/services/bookMetadata";
 
 const inputClassName = "mt-2 h-11 w-full rounded-md border border-input bg-background px-3 font-normal text-foreground outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20 aria-invalid:border-destructive aria-invalid:ring-destructive/20";
 
@@ -38,6 +41,8 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [lookupStatus, setLookupStatus] = useState("idle");
+  const [lookupMessage, setLookupMessage] = useState("");
 
   const updateField = (field, value) => {
     setValues((current) => ({
@@ -46,6 +51,38 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
       ...(field === "possessionStatus" && value !== POSSESSION_STATUS.LOANED ? { loanedTo: "" } : {}),
     }));
     setErrors((current) => ({ ...current, [field]: undefined }));
+    if (field === "isbn") {
+      setLookupStatus("idle");
+      setLookupMessage("");
+    }
+  };
+
+  const handleIsbnLookup = async () => {
+    if (lookupStatus === "loading") return;
+    if (!isValidIsbn(values.isbn)) {
+      setErrors((current) => ({ ...current, isbn: "Ingresa un ISBN-10 o ISBN-13 válido." }));
+      setLookupStatus("error");
+      setLookupMessage("Ingresa un ISBN-10 o ISBN-13 válido.");
+      return;
+    }
+
+    const isbn = normalizeIsbn(values.isbn);
+    setValues((current) => ({ ...current, isbn }));
+    setErrors((current) => ({ ...current, isbn: undefined }));
+    setLookupStatus("loading");
+    setLookupMessage("Buscando información del libro…");
+
+    try {
+      const metadata = await getBookMetadataByISBN(isbn);
+      setValues((current) => fillEmptyBookFields(current, metadata));
+      setLookupStatus("success");
+      setLookupMessage("Información del libro encontrada. Revisa los datos antes de guardar.");
+    } catch (error) {
+      setLookupStatus("error");
+      setLookupMessage(error?.code === "NOT_FOUND"
+        ? "No encontramos información para este ISBN. Puedes completar los datos manualmente."
+        : "No pudimos consultar la información del libro. Inténtalo nuevamente o completa los datos manualmente.");
+    }
   };
 
   const validate = () => {
@@ -98,6 +135,37 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
   return (
     <form ref={formRef} onSubmit={handleSubmit} noValidate aria-busy={submitting} className="space-y-8">
       {Object.keys(errors).length > 0 && <p role="alert" className="sr-only">Revisa los campos indicados antes de guardar el libro.</p>}
+      <fieldset className="min-w-0 rounded-lg border border-border bg-secondary/35 p-4 sm:p-6">
+        <legend className="px-2 font-heading text-lg font-semibold">Buscar por ISBN</legend>
+        <div className="grid items-start gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <label className="block text-sm font-semibold text-foreground">
+            ISBN
+            <input
+              value={values.isbn}
+              onChange={(event) => updateField("isbn", event.target.value)}
+              disabled={lookupStatus === "loading"}
+              inputMode="text"
+              autoComplete="off"
+              aria-invalid={Boolean(errors.isbn)}
+              aria-describedby={errors.isbn ? "isbn-error isbn-help" : "isbn-help"}
+              className={inputClassName}
+              placeholder="978-84-376-0494-7"
+            />
+            {errors.isbn && <span id="isbn-error" className="mt-1.5 block text-xs font-normal text-destructive">{errors.isbn}</span>}
+          </label>
+          <Button type="button" variant="outline" onClick={handleIsbnLookup} disabled={lookupStatus === "loading"} className="mt-0 h-11 w-full gap-2 px-4 text-sm sm:mt-7 sm:w-auto" aria-describedby="isbn-help" aria-busy={lookupStatus === "loading"}>
+            {lookupStatus === "loading" ? <CircleNotch aria-hidden="true" className="animate-spin" /> : <MagnifyingGlass aria-hidden="true" />}
+            {lookupStatus === "loading" ? "Buscando…" : "Buscar libro"}
+          </Button>
+        </div>
+        <p id="isbn-help" className="mt-2 text-xs leading-5 text-muted-foreground">Pinky puede intentar completar automáticamente los datos de esta edición. Tú decides qué conservar.</p>
+        {lookupMessage && (
+          <p role={lookupStatus === "error" ? "alert" : "status"} aria-live="polite" className={`mt-3 rounded-md border px-3 py-2 text-sm ${lookupStatus === "success" ? "border-primary/20 bg-primary/5 text-primary" : lookupStatus === "error" ? "border-destructive/25 bg-destructive/5 text-destructive" : "border-border bg-background text-muted-foreground"}`}>
+            {lookupMessage}
+          </p>
+        )}
+      </fieldset>
+
       <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">
         <legend className="px-2 font-heading text-xl font-semibold">Información principal</legend>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -135,7 +203,6 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
         <legend className="px-2 font-heading text-xl font-semibold">Datos de la edición</legend>
         <div className="grid gap-5 sm:grid-cols-2">
           {field("publisher", "Editorial")}
-          {field("isbn", "ISBN", { inputMode: "numeric" })}
           {field("publicationYear", "Año de publicación", { type: "number", min: "1", inputMode: "numeric" })}
           {field("pages", "Número de páginas", { type: "number", min: "1", inputMode: "numeric" })}
           <div className="min-w-0 sm:col-span-2">
