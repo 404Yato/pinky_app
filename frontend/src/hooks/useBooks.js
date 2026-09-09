@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { queryBookCollection } from "@/lib/bookQueries";
 import { getBooks } from "@/services/api/books";
 
 export function useBooks(query) {
-  const [books, setBooks] = useState([]);
+  const [loadedBooks, setLoadedBooks] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
   const [requestVersion, setRequestVersion] = useState(0);
@@ -18,13 +19,13 @@ export function useBooks(query) {
       setError(null);
 
       try {
-        const result = await getBooks(query);
+        const result = await getBooks();
         if (!active) return;
-        setBooks(result);
+        setLoadedBooks(result);
         setStatus("success");
       } catch (loadError) {
         if (!active) return;
-        setBooks([]);
+        setLoadedBooks([]);
         setError(loadError);
         setStatus("error");
       }
@@ -34,7 +35,12 @@ export function useBooks(query) {
     return () => {
       active = false;
     };
-  }, [query, requestVersion]);
+  }, [requestVersion]);
 
-  return { books, status, error, retry };
+  const filteredBooks = useMemo(
+    () => (status === "success" ? queryBookCollection(loadedBooks, query) : []),
+    [loadedBooks, query, status],
+  );
+
+  return { books: filteredBooks, status, error, retry };
 }

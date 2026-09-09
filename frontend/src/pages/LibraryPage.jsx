@@ -1,4 +1,4 @@
-import { useDeferredValue, useMemo, useState } from "react";
+import { useState } from "react";
 import { Plus } from "@phosphor-icons/react";
 
 import { BookFilters } from "@/components/books/BookFilters";
@@ -12,9 +12,7 @@ import { useBooks } from "@/hooks/useBooks";
 
 export function LibraryPage({ onSelectBook, onCreateBook, successMessage, onDismissSuccess }) {
   const [filters, setFilters] = useState({ ...DEFAULT_BOOK_QUERY });
-  const deferredSearch = useDeferredValue(filters.search);
-  const query = useMemo(() => ({ ...filters, search: deferredSearch }), [filters, deferredSearch]);
-  const { books, status, retry } = useBooks(query);
+  const { books, status, retry } = useBooks(filters);
 
   const hasActiveFilters = Boolean(filters.search || filters.status || filters.favorite !== null || filters.genre);
 

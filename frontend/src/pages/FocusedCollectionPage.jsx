@@ -1,4 +1,4 @@
-import { useDeferredValue, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { BookmarkSimple, CheckCircle, Clock, Heart } from "@phosphor-icons/react";
 
 import { BookFilters } from "@/components/books/BookFilters";
@@ -18,8 +18,7 @@ const collectionIcons = {
 
 export function FocusedCollectionPage({ collection, onSelectBook, successMessage, onDismissSuccess }) {
   const [filters, setFilters] = useState(() => ({ ...DEFAULT_BOOK_QUERY, ...collection.query }));
-  const deferredSearch = useDeferredValue(filters.search);
-  const query = useMemo(() => ({ ...filters, ...collection.query, search: deferredSearch }), [collection, filters, deferredSearch]);
+  const query = useMemo(() => ({ ...filters, ...collection.query }), [collection, filters]);
   const { books, status, retry } = useBooks(query);
   const fixedStatus = collection.query.status !== undefined;
   const fixedFavorite = collection.query.favorite !== undefined;
