@@ -23,6 +23,9 @@ const actions = [
   { format: "link", label: "Enlace", Icon: LinkSimple },
 ];
 
+const actionGroups = [actions.slice(0, 3), actions.slice(3, 7)];
+const toolButtonClassName = "grid size-10 place-items-center rounded-sm text-muted-foreground transition hover:bg-card hover:text-foreground focus-visible:bg-card focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-45 sm:size-9";
+
 export function MarkdownEditor({ id, value = "", onChange, disabled = false, placeholder = "", "aria-describedby": ariaDescribedBy }) {
   const textareaRef = useRef(null);
   const [history, setHistory] = useState([value]);
@@ -65,17 +68,21 @@ export function MarkdownEditor({ id, value = "", onChange, disabled = false, pla
 
   return (
     <div className="mt-2 overflow-hidden rounded-md border border-input bg-background transition focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20">
-      <div role="toolbar" aria-label="Formato de comentarios" className="flex flex-wrap gap-1 border-b border-border bg-secondary/55 p-2">
-        {actions.map(({ format: formatName, label, Icon }) => (
-          <button key={formatName} type="button" disabled={disabled} title={label} aria-label={label} onClick={() => format(formatName)} className="grid size-9 place-items-center rounded-sm text-muted-foreground transition hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-45">
-            <Icon aria-hidden="true" className="size-4" weight="bold" />
-          </button>
+      <div role="toolbar" aria-label="Formato de comentarios" className="flex flex-wrap items-center gap-1 border-b border-border bg-secondary/55 p-2">
+        {actionGroups.map((group, groupIndex) => (
+          <div key={groupIndex} role="group" aria-label={groupIndex === 0 ? "Estilo de texto" : "Bloques y enlaces"} className="flex items-center gap-1">
+            {group.map(({ format: formatName, label, Icon }) => (
+              <button key={formatName} type="button" disabled={disabled} title={label} aria-label={label} aria-keyshortcuts={formatName === "bold" ? "Control+B Meta+B" : formatName === "italic" ? "Control+I Meta+I" : undefined} onClick={() => format(formatName)} className={toolButtonClassName}>
+                <Icon aria-hidden="true" className="size-4" weight="bold" />
+              </button>
+            ))}
+          </div>
         ))}
-        <span aria-hidden="true" className="mx-1 my-1 w-px bg-border" />
-        <button type="button" disabled={disabled || historyIndex === 0} title="Deshacer" aria-label="Deshacer" onClick={() => moveHistory(historyIndex - 1)} className="grid size-9 place-items-center rounded-sm text-muted-foreground transition hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-45">
+        <span aria-hidden="true" className="mx-1 my-1 h-7 w-px bg-border" />
+        <button type="button" disabled={disabled || historyIndex === 0} title="Deshacer" aria-label="Deshacer" onClick={() => moveHistory(historyIndex - 1)} className={toolButtonClassName}>
           <ArrowCounterClockwise aria-hidden="true" className="size-4" />
         </button>
-        <button type="button" disabled={disabled || historyIndex >= history.length - 1} title="Rehacer" aria-label="Rehacer" onClick={() => moveHistory(historyIndex + 1)} className="grid size-9 place-items-center rounded-sm text-muted-foreground transition hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-45">
+        <button type="button" disabled={disabled || historyIndex >= history.length - 1} title="Rehacer" aria-label="Rehacer" onClick={() => moveHistory(historyIndex + 1)} className={toolButtonClassName}>
           <ArrowClockwise aria-hidden="true" className="size-4" />
         </button>
       </div>
@@ -94,7 +101,7 @@ export function MarkdownEditor({ id, value = "", onChange, disabled = false, pla
             format(event.key.toLowerCase() === "b" ? "bold" : "italic");
           }
         }}
-        className="min-h-48 w-full resize-y bg-transparent px-3 py-3 text-sm leading-7 text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60"
+        className="pinky-scrollbar h-56 min-h-48 max-h-[28rem] w-full resize-y overflow-x-hidden overflow-y-auto bg-transparent px-4 py-4 text-sm leading-7 text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60"
       />
     </div>
   );

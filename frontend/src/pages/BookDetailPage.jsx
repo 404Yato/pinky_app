@@ -136,7 +136,7 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
           </section>
 
           <BookPossessionDetails book={book} />
-          <BookComments comments={book.comments} />
+          <BookComments comments={book.comments} onEdit={onEdit} />
         </div>
       </article>
 
