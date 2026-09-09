@@ -1,18 +1,18 @@
 import { READING_STATUS } from "../constants/books.js";
-import { ITEM_TYPE_ID, MOCK_USER_ID } from "../constants/items.js";
+import { ITEM_TYPE_ID, MOCK_USER_ID, POSSESSION_STATUS } from "../constants/items.js";
 
 const canonicalBook = ({ item, book }) => ({
-  item: { user: MOCK_USER_ID, item_type: ITEM_TYPE_ID.BOOK, description: "", favorite: false, deleted_at: null, ...item },
+  item: { user: MOCK_USER_ID, item_type: ITEM_TYPE_ID.BOOK, description: "", favorite: false, possession_status: POSSESSION_STATUS.OWNED, location: null, loaned_to: null, deleted_at: null, ...item },
   book: { item: item.id, isbn: null, author: null, publisher: null, pages: null, publication_year: null, genre: null, cover_url: null, reading_status: READING_STATUS.PENDING, ...book },
 });
 
 export const mockBooks = Object.freeze([
   canonicalBook({
-    item: { id: 1, name: "Cien años de soledad", description: "La historia de la familia Buendía y del pueblo de Macondo a través de varias generaciones.", favorite: true, created_at: "2026-01-08T14:20:00.000Z", updated_at: "2026-02-18T19:45:00.000Z" },
+    item: { id: 1, name: "Cien años de soledad", description: "La historia de la familia Buendía y del pueblo de Macondo a través de varias generaciones.", favorite: true, location: "Librero dormitorio · Repisa superior", created_at: "2026-01-08T14:20:00.000Z", updated_at: "2026-02-18T19:45:00.000Z" },
     book: { isbn: "9780307474728", author: "Gabriel García Márquez", publisher: "Vintage Español", pages: 496, publication_year: 1967, genre: "Realismo mágico", reading_status: READING_STATUS.READ },
   }),
   canonicalBook({
-    item: { id: 2, name: "El nombre de la rosa", description: "Un misterio intelectual entre manuscritos, símbolos y pasadizos de una abadía medieval.", favorite: true, created_at: "2026-01-12T09:10:00.000Z", updated_at: "2026-08-22T21:05:00.000Z" },
+    item: { id: 2, name: "El nombre de la rosa", description: "Un misterio intelectual entre manuscritos, símbolos y pasadizos de una abadía medieval.", favorite: true, possession_status: POSSESSION_STATUS.LOANED, location: "Biblioteca del living · Repisa 2", loaned_to: "Nicolás", created_at: "2026-01-12T09:10:00.000Z", updated_at: "2026-08-22T21:05:00.000Z" },
     book: { isbn: "9788426418803", author: "Umberto Eco", publisher: "Lumen", pages: 608, publication_year: 1980, genre: "Misterio histórico", reading_status: READING_STATUS.READING },
   }),
   canonicalBook({

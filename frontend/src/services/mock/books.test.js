@@ -94,6 +94,8 @@ describe("canonical book adapters", () => {
     assert.equal(record.item.favorite, true);
     assert.equal(record.item.item_type, ITEM_TYPE_ID.BOOK);
     assert.equal(record.item.deleted_at, null);
+    assert.equal(record.item.possession_status, "OWNED");
+    assert.equal(record.item.location, "Librero dormitorio · Repisa superior");
     assert.equal(record.book.item, record.item.id);
     assert.equal(record.book.author, "Gabriel García Márquez");
     assert.equal(Object.hasOwn(record.book, "favorite"), false);
@@ -109,6 +111,7 @@ describe("canonical book adapters", () => {
     assert.equal(viewModel.createdAt, mockBooks[0].item.created_at);
     assert.equal(viewModel.publicationYear, mockBooks[0].book.publication_year);
     assert.equal(viewModel.readingStatus, "READ");
+    assert.equal(viewModel.possessionStatus, "OWNED");
   });
 
   test("maps form values into separate Item and Book create data", () => {
@@ -120,12 +123,18 @@ describe("canonical book adapters", () => {
       publicationYear: "2024",
       author: "  Autora  ",
       readingStatus: READING_STATUS.READING,
+      possessionStatus: "LOANED",
+      location: "  Repisa 2  ",
+      loanedTo: "  Nicolás  ",
     });
 
     assert.deepEqual(command.item, {
       name: "Nuevo libro",
       description: "",
       favorite: false,
+      possession_status: "LOANED",
+      location: "Repisa 2",
+      loaned_to: "Nicolás",
     });
     assert.equal(command.book.author, "Autora");
     assert.equal(command.book.pages, 240);
@@ -138,6 +147,13 @@ describe("canonical book adapters", () => {
     assert.deepEqual(bookFormToUpdateCommand({ title: "Otro título", pages: "" }), {
       item: { name: "Otro título" },
       book: { pages: null },
+    });
+  });
+
+  test("clears stale borrower data when possession is no longer loaned", () => {
+    assert.deepEqual(bookFormToUpdateCommand({ possessionStatus: "OWNED", loanedTo: "Nicolás" }).item, {
+      possession_status: "OWNED",
+      loaned_to: null,
     });
   });
 });

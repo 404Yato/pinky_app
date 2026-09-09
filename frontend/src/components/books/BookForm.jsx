@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { READING_STATUS } from "@/constants/books";
+import { POSSESSION_STATUS, POSSESSION_STATUS_LABEL } from "@/constants/items";
 
 const inputClassName = "mt-2 h-11 w-full rounded-md border border-input bg-background px-3 font-normal text-foreground outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20 aria-invalid:border-destructive aria-invalid:ring-destructive/20";
 
@@ -16,6 +17,9 @@ const emptyBook = {
   genre: "",
   readingStatus: READING_STATUS.PENDING,
   favorite: false,
+  possessionStatus: POSSESSION_STATUS.OWNED,
+  location: "",
+  loanedTo: "",
 };
 
 function getInitialValues(book) {
@@ -31,7 +35,11 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
   const [submitting, setSubmitting] = useState(false);
 
   const updateField = (field, value) => {
-    setValues((current) => ({ ...current, [field]: value }));
+    setValues((current) => ({
+      ...current,
+      [field]: value,
+      ...(field === "possessionStatus" && value !== POSSESSION_STATUS.LOANED ? { loanedTo: "" } : {}),
+    }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   };
 
@@ -99,6 +107,22 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
             <textarea value={values.description} onChange={(event) => updateField("description", event.target.value)} rows="6" className="mt-2 w-full resize-y rounded-md border border-input bg-background px-3 py-2 font-normal leading-7 text-foreground outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20" />
           </label>
         </div>
+      </fieldset>
+
+      <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">
+        <legend className="px-2 font-heading text-xl font-semibold">Tu ejemplar</legend>
+        <p className="mb-5 text-sm leading-6 text-muted-foreground">Guarda dónde suele estar y si alguien lo tiene prestado.</p>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="block text-sm font-semibold text-foreground">
+            Posesión
+            <select value={values.possessionStatus} onChange={(event) => updateField("possessionStatus", event.target.value)} className={inputClassName}>
+              {Object.entries(POSSESSION_STATUS_LABEL).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label>
+          {field("location", values.possessionStatus === POSSESSION_STATUS.LOANED ? "Ubicación habitual" : "Ubicación", { maxLength: 255, placeholder: "Librero dormitorio · Repisa 2" })}
+          {values.possessionStatus === POSSESSION_STATUS.LOANED && field("loanedTo", "Prestado a", { maxLength: 255, placeholder: "Nombre de la persona" })}
+        </div>
+        <p className="sr-only" aria-live="polite">{values.possessionStatus === POSSESSION_STATUS.LOANED ? "El campo Prestado a está disponible." : "El campo Prestado a está oculto."}</p>
       </fieldset>
 
       <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">

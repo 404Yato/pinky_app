@@ -7,7 +7,7 @@ import { clearTokens, setTokens } from "../../lib/api/tokens.js";
 
 const values = new Map();
 const detail = {
-  id: 4, user: 1, item_type: 1, name: "Piranesi", description: "", favorite: false,
+  id: 4, user: 1, item_type: 1, name: "Piranesi", description: "", favorite: false, possession_status: "OWNED", location: null, loaned_to: null,
   created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:00:00Z", deleted_at: null,
   details: { item: 4, isbn: null, author: "Susanna Clarke", publisher: null, pages: 272, publication_year: 2020, genre: "Fantasía", cover_url: null, reading_status: "PENDING" },
 };
@@ -39,19 +39,29 @@ test("hydrates base item listings and keeps filtering local", async () => {
   assert.equal(books[0].title, "Piranesi");
 });
 
-test("works around favorite-on-create and returns a hydrated view model", async () => {
+test("creates the complete Item and Book with one POST request", async () => {
   const requests = [];
   globalThis.fetch = async (url, options) => {
     requests.push({ url, options });
-    if (requests.length === 1) return new Response(JSON.stringify({ id: 4 }), { status: 201 });
-    if (requests.length === 2) return new Response(JSON.stringify({ message: "updated", data: { id: 4 } }), { status: 200 });
-    return new Response(JSON.stringify({ ...detail, favorite: true }), { status: 200 });
+    return new Response(JSON.stringify({ ...detail, favorite: true, possession_status: "LOANED", location: "Repisa", loaned_to: "Nicolás" }), { status: 201 });
   };
 
-  const book = await createBook({ title: "Piranesi", favorite: true, readingStatus: "PENDING" });
+  const book = await createBook({ title: "Piranesi", favorite: true, possessionStatus: "LOANED", location: "Repisa", loanedTo: "Nicolás", readingStatus: "PENDING" });
   assert.equal(book.favorite, true);
-  assert.equal(requests[1].options.method, "PUT");
-  assert.deepEqual(JSON.parse(requests[1].options.body), { favorite: true, details: {} });
+  assert.equal(book.possessionStatus, "LOANED");
+  assert.equal(book.loanedTo, "Nicolás");
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0].options.method, "POST");
+  assert.deepEqual(JSON.parse(requests[0].options.body), {
+    item_type: 1,
+    name: "Piranesi",
+    description: "",
+    favorite: true,
+    possession_status: "LOANED",
+    location: "Repisa",
+    loaned_to: "Nicolás",
+    details: { isbn: null, author: null, publisher: null, pages: null, publication_year: null, genre: null, cover_url: null, reading_status: "PENDING" },
+  });
 });
 
 test("resolves a successful update immediately without a post-save refetch", async () => {

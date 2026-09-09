@@ -1,5 +1,5 @@
 import { READING_STATUS } from "../constants/books.js";
-import { ITEM_TYPE_ID } from "../constants/items.js";
+import { ITEM_TYPE_ID, POSSESSION_STATUS } from "../constants/items.js";
 
 const nullableString = (value) => {
   if (value === undefined || value === null) return null;
@@ -23,6 +23,11 @@ function bookFormToCommand(values) {
       name: requiredString(values?.title),
       description: requiredString(values?.description),
       favorite: booleanValue(values?.favorite),
+      possession_status: values?.possessionStatus ?? POSSESSION_STATUS.OWNED,
+      location: nullableString(values?.location),
+      loaned_to: values?.possessionStatus === POSSESSION_STATUS.LOANED
+        ? nullableString(values?.loanedTo)
+        : null,
     },
     book: {
       isbn: nullableString(values?.isbn),
@@ -46,6 +51,9 @@ export function bookRecordToViewModel(record) {
     createdAt: record.item.created_at,
     updatedAt: record.item.updated_at,
     deletedAt: record.item.deleted_at,
+    possessionStatus: record.item.possession_status,
+    location: record.item.location,
+    loanedTo: record.item.loaned_to,
     author: record.book.author,
     isbn: record.book.isbn,
     publisher: record.book.publisher,
@@ -65,7 +73,14 @@ export function bookFormToUpdateCommand(values) {
   const fullCommand = bookFormToCommand(values);
   const item = {};
   const book = {};
-  const itemFields = { title: "name", description: "description", favorite: "favorite" };
+  const itemFields = {
+    title: "name",
+    description: "description",
+    favorite: "favorite",
+    possessionStatus: "possession_status",
+    location: "location",
+    loanedTo: "loaned_to",
+  };
   const bookFields = {
     isbn: "isbn",
     author: "author",
@@ -94,6 +109,9 @@ export function bookApiResponseToRecord(response) {
       ...item,
       description: item.description ?? "",
       favorite: Boolean(item.favorite),
+      possession_status: item.possession_status ?? POSSESSION_STATUS.OWNED,
+      location: item.location ?? null,
+      loaned_to: item.loaned_to ?? null,
       deleted_at: item.deleted_at ?? null,
     },
     book: {
@@ -139,6 +157,9 @@ export function bookMutationResponseToViewModel(currentBook, command, response) 
     createdAt: item.created_at ?? current.createdAt ?? null,
     updatedAt: item.updated_at ?? current.updatedAt ?? null,
     deletedAt: item.deleted_at ?? current.deletedAt ?? null,
+    possessionStatus: item.possession_status ?? commandValue(command.item, "possession_status", current.possessionStatus ?? POSSESSION_STATUS.OWNED),
+    location: item.location ?? commandValue(command.item, "location", current.location ?? null),
+    loanedTo: item.loaned_to ?? commandValue(command.item, "loaned_to", current.loanedTo ?? null),
     author: commandValue(command.book, "author", current.author ?? null),
     isbn: commandValue(command.book, "isbn", current.isbn ?? null),
     publisher: commandValue(command.book, "publisher", current.publisher ?? null),

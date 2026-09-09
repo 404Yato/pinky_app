@@ -57,17 +57,7 @@ export async function createBook(input) {
     method: "POST",
     body: bookCreateCommandToApiPayload(command),
   });
-
-  // The current backend accepts but does not persist favorite during creation.
-  let result = created;
-  if (command.item.favorite) {
-    const favoriteResult = await apiRequest(`/inventory/items/${created.id}/`, {
-      method: "PUT",
-      body: { favorite: true, details: {} },
-    });
-    result = favoriteResult?.data ?? favoriteResult ?? { ...created, favorite: true };
-  }
-  return bookMutationResponseToViewModel(null, command, result?.data ?? result ?? created);
+  return bookMutationResponseToViewModel(null, command, created);
 }
 
 export async function updateBook(id, input, currentBook = null) {

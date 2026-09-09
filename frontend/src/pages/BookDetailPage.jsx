@@ -5,6 +5,7 @@ import { BookCover } from "@/components/books/BookCover";
 import { BookDetailSkeleton } from "@/components/books/BookDetailSkeleton";
 import { BookStatus } from "@/components/books/BookStatus";
 import { DeleteBookDialog } from "@/components/books/DeleteBookDialog";
+import { BookPossessionDetails } from "@/components/books/BookPossessionDetails";
 import { Button } from "@/components/ui/button";
 import { StatusNotice } from "@/components/feedback/StatusNotice";
 import { READING_STATUS } from "@/constants/books";
@@ -131,6 +132,8 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
               ))}
             </dl>
           </section>
+
+          <BookPossessionDetails book={book} />
         </div>
       </article>
 
