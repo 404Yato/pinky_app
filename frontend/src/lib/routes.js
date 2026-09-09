@@ -28,12 +28,14 @@ export function parseRoute(path = "/") {
 
   if (pathname === "/login") return { page: "login", bookId: null, success: getAuthSuccess(query) };
   if (pathname === "/register") return { page: "register", bookId: null, success: null };
+  if (pathname === "/") return { page: "landing", bookId: null, success: null };
+  if (pathname === "/app") return { page: "home", bookId: null, success: null };
   if (pathname === "/library/new") return { page: "book-create", bookId: null, success: null };
   if (editMatch) return { page: "book-edit", bookId: Number(editMatch[1]), success: null, returnTo: getReturnTo(query) };
   if (detailMatch) return { page: "book-detail", bookId: Number(detailMatch[1]), success: getSuccess(query), returnTo: getReturnTo(query) };
   if (pathname === "/library") return { page: "library", bookId: null, success: getSuccess(query) };
   if (collection) return { page: "collection", collectionId: collection.id, bookId: null, success: getSuccess(query) };
-  return { page: "home", bookId: null, success: null };
+  return { page: "landing", bookId: null, success: null };
 }
 
 export function readRoute() {

@@ -3,6 +3,11 @@ import test from "node:test";
 
 import { parseRoute, withAuthSuccess, withReturnTo, withSuccess } from "./routes.js";
 
+test("separates the public landing page from authenticated home", () => {
+  assert.deepEqual(parseRoute("/"), { page: "landing", bookId: null, success: null });
+  assert.deepEqual(parseRoute("/app"), { page: "home", bookId: null, success: null });
+});
+
 test("parses each focused collection route", () => {
   for (const collectionId of ["favorites", "read", "reading", "pending"]) {
     assert.deepEqual(parseRoute(`/${collectionId}`), { page: "collection", collectionId, bookId: null, success: null });

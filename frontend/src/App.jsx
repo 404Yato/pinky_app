@@ -12,6 +12,7 @@ import { LibraryPage } from "@/pages/LibraryPage";
 import { FocusedCollectionPage } from "@/pages/FocusedCollectionPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
+import { LandingPage } from "@/pages/LandingPage";
 
 function App() {
   const [route, setRoute] = useState(readRoute);
@@ -31,8 +32,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (authenticated && (route.page === "login" || route.page === "register")) navigateTo("/");
+    if (authenticated && (route.page === "login" || route.page === "register")) navigateTo("/app");
   }, [authenticated, route.page]);
+
+  if (route.page === "landing") return <LandingPage authenticated={authenticated} />;
 
   if (authStatus === "loading") return <AuthLoadingState />;
   if (authStatus === "error") return <AuthLoadingState error onRetry={retryAuth} />;
@@ -46,7 +49,7 @@ function App() {
     }
     return <LoginPage successMessage={route.success === "registered" ? "Cuenta creada correctamente. Ya puedes iniciar sesión." : null} onDismissSuccess={() => navigateTo("/login")} onLogin={async (credentials) => {
       await login(credentials);
-      if (route.page === "login") navigateTo("/");
+      if (route.page === "login") navigateTo("/app");
     }} />;
   }
 
@@ -56,7 +59,7 @@ function App() {
   };
 
   const handleNavigate = (itemId) => {
-    const destination = getFocusedCollection(itemId)?.path ?? (itemId === "library" ? "/library" : "/");
+    const destination = getFocusedCollection(itemId)?.path ?? (itemId === "library" ? "/library" : "/app");
     navigateTo(destination);
   };
 
