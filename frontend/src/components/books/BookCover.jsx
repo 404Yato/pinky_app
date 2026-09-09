@@ -18,7 +18,7 @@ export function BookCover({ book }) {
         src={book.coverUrl}
         alt={`Portada de ${book.title}`}
         onError={() => setFailedUrl(book.coverUrl)}
-        className="aspect-[2/3] h-full w-full object-cover"
+        className="h-full w-full object-cover"
       />
     );
   }
@@ -29,7 +29,7 @@ export function BookCover({ book }) {
     <div
       role="img"
       aria-label={`Portada ilustrativa de ${book.title}`}
-      className={`relative flex aspect-[2/3] h-full w-full flex-col justify-between overflow-hidden bg-gradient-to-br p-4 ${style}`}
+      className={`relative flex h-full w-full flex-col justify-between overflow-hidden bg-gradient-to-br p-4 ${style}`}
     >
       <span className="absolute inset-y-0 left-3 w-px bg-white/20" aria-hidden="true" />
       <BookOpenText aria-hidden="true" className="ml-auto size-5 opacity-70" weight="duotone" />

@@ -88,8 +88,8 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
         <ArrowLeft aria-hidden="true" className="size-4" /> Volver a la biblioteca
       </button>
 
-      <article className="grid min-w-0 gap-7 md:grid-cols-[minmax(12rem,17rem)_minmax(0,1fr)] md:gap-8 xl:grid-cols-[minmax(14rem,20rem)_minmax(0,1fr)] xl:gap-12">
-        <div className="mx-auto w-full max-w-64 overflow-hidden rounded-lg border border-border bg-secondary shadow-[0_10px_30px_rgb(59_42_32_/_0.12)] min-[420px]:max-w-72 md:mx-0 md:max-w-none">
+      <article className="grid min-w-0 items-start gap-7 md:grid-cols-[minmax(12rem,17rem)_minmax(0,1fr)] md:gap-8 xl:grid-cols-[minmax(14rem,20rem)_minmax(0,1fr)] xl:gap-12">
+        <div className="mx-auto aspect-[2/3] w-full max-w-64 self-start overflow-hidden rounded-lg border border-border bg-secondary shadow-[0_10px_30px_rgb(59_42_32_/_0.12)] min-[420px]:max-w-72 md:mx-0 md:max-w-none">
           <BookCover book={book} />
         </div>
 
