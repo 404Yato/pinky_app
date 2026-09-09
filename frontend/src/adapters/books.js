@@ -9,6 +9,11 @@ const nullableString = (value) => {
 
 const requiredString = (value) => String(value ?? "").trim();
 
+const markdownString = (value) => {
+  const normalized = String(value ?? "");
+  return normalized.trim() ? normalized : "";
+};
+
 const nullablePositiveInteger = (value) => {
   if (value === undefined || value === null || value === "") return null;
   const normalized = Number(value);
@@ -22,6 +27,7 @@ function bookFormToCommand(values) {
     item: {
       name: requiredString(values?.title),
       description: requiredString(values?.description),
+      comments: markdownString(values?.comments),
       favorite: booleanValue(values?.favorite),
       possession_status: values?.possessionStatus ?? POSSESSION_STATUS.OWNED,
       location: nullableString(values?.location),
@@ -47,6 +53,7 @@ export function bookRecordToViewModel(record) {
     id: record.item.id,
     title: record.item.name,
     description: record.item.description,
+    comments: record.item.comments ?? "",
     favorite: record.item.favorite,
     createdAt: record.item.created_at,
     updatedAt: record.item.updated_at,
@@ -76,6 +83,7 @@ export function bookFormToUpdateCommand(values) {
   const itemFields = {
     title: "name",
     description: "description",
+    comments: "comments",
     favorite: "favorite",
     possessionStatus: "possession_status",
     location: "location",
@@ -108,6 +116,7 @@ export function bookApiResponseToRecord(response) {
     item: {
       ...item,
       description: item.description ?? "",
+      comments: item.comments ?? "",
       favorite: Boolean(item.favorite),
       possession_status: item.possession_status ?? POSSESSION_STATUS.OWNED,
       location: item.location ?? null,
@@ -153,6 +162,7 @@ export function bookMutationResponseToViewModel(currentBook, command, response) 
     id: item.id ?? current.id,
     title: item.name ?? commandValue(command.item, "name", current.title),
     description: item.description ?? commandValue(command.item, "description", current.description ?? ""),
+    comments: item.comments ?? commandValue(command.item, "comments", current.comments ?? ""),
     favorite: item.favorite ?? commandValue(command.item, "favorite", current.favorite ?? false),
     createdAt: item.created_at ?? current.createdAt ?? null,
     updatedAt: item.updated_at ?? current.updatedAt ?? null,

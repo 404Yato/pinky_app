@@ -7,7 +7,7 @@ import { clearTokens, setTokens } from "../../lib/api/tokens.js";
 
 const values = new Map();
 const detail = {
-  id: 4, user: 1, item_type: 1, name: "Piranesi", description: "", favorite: false, possession_status: "OWNED", location: null, loaned_to: null,
+  id: 4, user: 1, item_type: 1, name: "Piranesi", description: "", comments: "Mi nota", favorite: false, possession_status: "OWNED", location: null, loaned_to: null,
   created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:00:00Z", deleted_at: null,
   details: { item: 4, isbn: null, author: "Susanna Clarke", publisher: null, pages: 272, publication_year: 2020, genre: "Fantasía", cover_url: null, reading_status: "PENDING" },
 };
@@ -43,20 +43,22 @@ test("creates the complete Item and Book with one POST request", async () => {
   const requests = [];
   globalThis.fetch = async (url, options) => {
     requests.push({ url, options });
-    return new Response(JSON.stringify({ ...detail, favorite: true, possession_status: "LOANED", location: "Repisa", loaned_to: "Nicolás" }), { status: 201 });
+    return new Response(JSON.stringify({ ...detail, comments: "Un **recuerdo**", favorite: true, possession_status: "LOANED", location: "Repisa", loaned_to: "Nicolás" }), { status: 201 });
   };
 
-  const book = await createBook({ title: "Piranesi", favorite: true, possessionStatus: "LOANED", location: "Repisa", loanedTo: "Nicolás", coverUrl: "https://example.com/cover", readingStatus: "PENDING" });
+  const book = await createBook({ title: "Piranesi", comments: "Un **recuerdo**", favorite: true, possessionStatus: "LOANED", location: "Repisa", loanedTo: "Nicolás", coverUrl: "https://example.com/cover", readingStatus: "PENDING" });
   assert.equal(book.favorite, true);
   assert.equal(book.possessionStatus, "LOANED");
   assert.equal(book.loanedTo, "Nicolás");
   assert.equal(book.coverUrl, "https://example.com/cover");
+  assert.equal(book.comments, "Un **recuerdo**");
   assert.equal(requests.length, 1);
   assert.equal(requests[0].options.method, "POST");
   assert.deepEqual(JSON.parse(requests[0].options.body), {
     item_type: 1,
     name: "Piranesi",
     description: "",
+    comments: "Un **recuerdo**",
     favorite: true,
     possession_status: "LOANED",
     location: "Repisa",
@@ -69,15 +71,17 @@ test("resolves a successful update immediately without a post-save refetch", asy
   const requests = [];
   globalThis.fetch = async (url, options) => {
     requests.push({ url, options });
-    return new Response(JSON.stringify({ message: "updated", data: { ...detail, name: "Piranesi revisado", details: undefined } }), { status: 200 });
+    return new Response(JSON.stringify({ message: "updated", data: { ...detail, name: "Piranesi revisado", comments: "Nueva *nota*", details: undefined } }), { status: 200 });
   };
 
-  const updated = await updateBook(4, { title: "Piranesi revisado", pages: "300", coverUrl: "https://example.com/new-cover" }, currentBook);
+  const updated = await updateBook(4, { title: "Piranesi revisado", comments: "Nueva *nota*", pages: "300", coverUrl: "https://example.com/new-cover" }, currentBook);
   assert.equal(requests.length, 1);
   assert.equal(updated.title, "Piranesi revisado");
   assert.equal(updated.pages, 300);
   assert.equal(updated.coverUrl, "https://example.com/new-cover");
+  assert.equal(updated.comments, "Nueva *nota*");
   assert.equal(JSON.parse(requests[0].options.body).details.cover_url, "https://example.com/new-cover");
+  assert.equal(JSON.parse(requests[0].options.body).comments, "Nueva *nota*");
 });
 
 test("accepts an empty successful update response and applies submitted values", async () => {

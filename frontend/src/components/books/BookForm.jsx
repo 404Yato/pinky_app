@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 
 import { BookCover } from "@/components/books/BookCover";
+import { MarkdownEditor } from "@/components/forms/MarkdownEditor";
 import { Button } from "@/components/ui/button";
 import { READING_STATUS } from "@/constants/books";
 import { POSSESSION_STATUS, POSSESSION_STATUS_LABEL } from "@/constants/items";
@@ -12,6 +13,7 @@ const emptyBook = {
   title: "",
   author: "",
   description: "",
+  comments: "",
   isbn: "",
   publisher: "",
   pages: "",
@@ -182,6 +184,20 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
             Marcar como favorito
           </label>
         </div>
+      </fieldset>
+
+      <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">
+        <legend className="px-2 font-heading text-xl font-semibold">Comentarios personales</legend>
+        <p id="comments-help" className="mb-4 text-sm leading-6 text-muted-foreground">Guarda aquí recuerdos, impresiones o notas personales sobre este libro. Puedes darles formato con la barra sin aprender Markdown.</p>
+        <label htmlFor="comments" className="sr-only">Comentarios personales</label>
+        <MarkdownEditor
+          id="comments"
+          value={values.comments}
+          onChange={(comments) => updateField("comments", comments)}
+          disabled={submitting}
+          aria-describedby="comments-help"
+          placeholder="Por ejemplo: quién te lo regaló, dónde lo leíste o qué te hizo sentir…"
+        />
       </fieldset>
 
       {submitError && <p role="alert" className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">{submitError}</p>}

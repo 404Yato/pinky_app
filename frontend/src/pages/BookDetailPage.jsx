@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Heart, PencilSimple, Trash, WarningCircle } from "@phosphor-icons/react";
 
 import { BookCover } from "@/components/books/BookCover";
+import { BookComments } from "@/components/books/BookComments";
 import { BookDetailSkeleton } from "@/components/books/BookDetailSkeleton";
 import { BookStatus } from "@/components/books/BookStatus";
 import { DeleteBookDialog } from "@/components/books/DeleteBookDialog";
@@ -135,6 +136,7 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
           </section>
 
           <BookPossessionDetails book={book} />
+          <BookComments comments={book.comments} />
         </div>
       </article>
 

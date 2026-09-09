@@ -92,6 +92,7 @@ describe("canonical book adapters", () => {
 
     assert.equal(record.item.name, "Cien años de soledad");
     assert.equal(record.item.favorite, true);
+    assert.equal(typeof record.item.comments, "string");
     assert.equal(record.item.item_type, ITEM_TYPE_ID.BOOK);
     assert.equal(record.item.deleted_at, null);
     assert.equal(record.item.possession_status, "OWNED");
@@ -108,6 +109,7 @@ describe("canonical book adapters", () => {
     assert.equal(viewModel.title, mockBooks[0].item.name);
     assert.equal(viewModel.favorite, mockBooks[0].item.favorite);
     assert.equal(viewModel.description, mockBooks[0].item.description);
+    assert.equal(viewModel.comments, mockBooks[0].item.comments);
     assert.equal(viewModel.createdAt, mockBooks[0].item.created_at);
     assert.equal(viewModel.publicationYear, mockBooks[0].book.publication_year);
     assert.equal(viewModel.readingStatus, "READ");
@@ -118,6 +120,7 @@ describe("canonical book adapters", () => {
     const command = bookFormToCreateCommand({
       title: "  Nuevo libro  ",
       description: "",
+      comments: "Lo leí en **invierno**.",
       favorite: "false",
       pages: "240",
       publicationYear: "2024",
@@ -131,6 +134,7 @@ describe("canonical book adapters", () => {
     assert.deepEqual(command.item, {
       name: "Nuevo libro",
       description: "",
+      comments: "Lo leí en **invierno**.",
       favorite: false,
       possession_status: "LOANED",
       location: "Repisa 2",
@@ -168,6 +172,7 @@ describe("mock book mutations", () => {
     assert.equal(created.readingStatus, READING_STATUS.PENDING);
     assert.equal(created.favorite, false);
     assert.equal(created.description, "");
+    assert.equal(created.comments, "");
     assert.equal(created.deletedAt, null);
     assert.equal(created.createdAt, created.updatedAt);
     assert.equal((await getBooks()).length, 21);
