@@ -35,6 +35,18 @@ class ItemCreateSerializer(serializers.Serializer):
         allow_blank=True
     )
     favorite = serializers.BooleanField(),
+    possession_status = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
+    location = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
+    loaned_to = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
     details = serializers.JSONField(
         required=False,
         help_text=(
