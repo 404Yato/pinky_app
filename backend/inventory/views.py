@@ -67,6 +67,10 @@ class ItemListView(APIView):
                     "name": "Más allá del bien y del mal",
                     "description": 'Publicado en 1886 el libro se coloca más allá de las doctrinas dualistas, de ahí su título. De nuevo Nietzsche lanza una potente diatriba contra el mundo moderno y tras destruir sus doctrinas levanta su "ciencia de la moral" que tendrá su continuidad en la Genealogía de la moral, rechazando toda suerte de hipocresías que han esclavizado y esclavizan a la humanidad e impiden el advenimiento del superhombre.',
                     "favorite": True,
+                    "comments": "Good Book.",
+                    "possession_status": "OWNED",
+                    "location": "Repisa 1 Habitación",
+                    "loaned_to": "Rodrigo",
                     "details": {
                         "isbn": "9788410109254",
                         "author": "Friedrich Nietzsche",

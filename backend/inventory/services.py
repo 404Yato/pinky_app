@@ -55,6 +55,10 @@ def add_item(data, user):
                 'favorite',
                 False
             ),
+            comments=validated_data.get(
+                'comments',
+                ''
+            ),
             possession_status=validated_data.get(
                 'possession_status',
                 'OWNED'

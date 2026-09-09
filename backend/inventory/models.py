@@ -41,6 +41,10 @@ class Item(models.Model):
         default=False
     )
 
+    comments = models.TextField(
+        blank=True
+    )
+    
     possession_status = models.CharField(
         max_length=20,
         choices=[

@@ -35,6 +35,10 @@ class ItemCreateSerializer(serializers.Serializer):
         allow_blank=True
     )
     favorite = serializers.BooleanField()
+    comments = serializers.CharField(
+        required=False,
+        allow_blank=True
+    )
     possession_status = serializers.CharField(
         required=False,
         allow_blank=True
