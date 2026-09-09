@@ -5,9 +5,9 @@ import { BookStatus } from "@/components/books/BookStatus";
 import { READING_STATUS } from "@/constants/books";
 
 const previewBooks = [
-  { id: 1, name: "Cien años de soledad", details: { author: "Gabriel García Márquez", cover_url: null, reading_status: READING_STATUS.READ }, favorite: true },
-  { id: 5, name: "Piranesi", details: { author: "Susanna Clarke", cover_url: null, reading_status: READING_STATUS.READING }, favorite: false },
-  { id: 3, name: "La mano izquierda de la oscuridad", details: { author: "Ursula K. Le Guin", cover_url: null, reading_status: READING_STATUS.PENDING }, favorite: false },
+  { id: 1, name: "Space Invaders", details: { author: "Nona Fernandez", cover_url: "https://images.cdn2.buscalibre.com/fit-in/660x660/9c/8e/9c8ecac4fb8dcb0adb9e6c93318e021a.jpg", reading_status: READING_STATUS.READ }, favorite: true },
+  { id: 5, name: "El extranjero", details: { author: "Albert Camus", cover_url: "https://images.cdn1.buscalibre.com/fit-in/660x660/c4/21/c42165145effb77177eb2d0866235167.jpg", reading_status: READING_STATUS.READING }, favorite: false },
+  { id: 3, name: "El bosque de los pigmeos", details: { author: "Isabel Allende", cover_url: "https://images.cdn1.buscalibre.com/fit-in/660x660/75/62/7562dd2d45400a37e6c7b740b4ac0c08.jpg", reading_status: READING_STATUS.PENDING }, favorite: false },
 ];
 
 export function LandingPreview() {
@@ -47,8 +47,8 @@ export function LandingPreview() {
             </div>
             <blockquote className="rounded-md border border-border bg-[#f7ecdf] p-4 text-sm leading-6 text-foreground">
               <Quotes aria-hidden="true" className="mb-2 size-5 text-primary" weight="fill" />
-              <p className="font-heading">“Cada lector encuentra una casa distinta dentro del mismo libro.”</p>
-              <footer className="mt-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Página 42</footer>
+              <p className="font-heading">“No se trataba de miedo a amar a alguien, sino más bien de miedo a llegar a odiar.”</p>
+              <footer className="mt-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Página 214</footer>
             </blockquote>
           </div>
         </div>

@@ -49,12 +49,12 @@ export function LandingPage({ authenticated = false }) {
             <div className="max-w-2xl">
               <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-primary"><Heart aria-hidden="true" className="size-4" weight="fill" /> Tu espacio personal</p>
               <h1 className="mt-5 font-heading text-4xl font-semibold leading-[1.08] tracking-tight min-[400px]:text-5xl sm:text-6xl xl:text-7xl">Tu colección,<br /><span className="text-primary">a tu manera.</span></h1>
-              <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">Organiza tus libros, recuerda dónde están, guarda tus fragmentos favoritos y lleva contigo la historia de cada ejemplar.</p>
+              <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">Organiza tus libros, recuerda dónde están, guarda tus fragmentos favoritos y preserva la historia de cada ejemplar.</p>
               <div className="mt-8 flex flex-col gap-3 min-[400px]:flex-row">
                 <Link to={primaryTo} className={cn(buttonVariants(), primaryLink)}>{primaryLabel}<ArrowRight aria-hidden="true" /></Link>
                 {!authenticated && <Link to="/login" className={cn(buttonVariants({ variant: "outline" }), secondaryLink)}>Iniciar sesión</Link>}
               </div>
-              <p className="mt-6 text-sm text-muted-foreground">Sin feeds. Sin seguidores. Solo tus libros y la forma en que viven contigo.</p>
+              <p className="mt-6 text-sm text-muted-foreground">Sin feeds. Sin seguidores. Solo tu colección de libros y tú.</p>
             </div>
             <LandingPreview />
           </div>
@@ -64,7 +64,7 @@ export function LandingPage({ authenticated = false }) {
           <div className="mx-auto max-w-6xl">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Lo que importa, cerca</p>
-              <h2 id="features-title" className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Un lugar tranquilo para tu biblioteca.</h2>
+              <h2 id="features-title" className="mt-3 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Un lugar tranquilo para desconectar.</h2>
             </div>
             <div className="mt-12 grid gap-x-10 gap-y-10 sm:grid-cols-2">
               {features.map(({ icon: Icon, title, text }) => (
@@ -87,7 +87,7 @@ export function LandingPage({ authenticated = false }) {
               <Record aria-hidden="true" className="size-8 text-sidebar-ring" weight="duotone" />
               <p className="mt-7 text-sm font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/60">Una colección que puede crecer</p>
               <h2 className="mt-3 font-heading text-3xl font-semibold">Hoy libros.<br />Mañana, el resto de tu colección.</h2>
-              <p className="mt-4 text-sm leading-7 text-sidebar-foreground/70">Pinky empieza por las historias impresas y está pensado para recibir otros objetos queridos, como tus vinilos, en el futuro.</p>
+              <p className="mt-4 text-sm leading-7 text-sidebar-foreground/70">Pinky empieza por las historias detrás de tus libros y está pensado para recibir en el futuro, todo aquello que te importa y atesoras.</p>
             </div>
           </div>
         </section>
@@ -95,7 +95,7 @@ export function LandingPage({ authenticated = false }) {
         <section className="border-t border-border bg-secondary px-4 py-20 text-center sm:px-6 sm:py-24">
           <div className="mx-auto max-w-2xl">
             <Books aria-hidden="true" className="mx-auto size-10 text-primary" weight="duotone" />
-            <h2 className="mt-5 font-heading text-3xl font-semibold sm:text-4xl">Hazle un lugar a tus historias.</h2>
+            <h2 className="mt-5 font-heading text-3xl font-semibold sm:text-4xl">Construye un pequeño hogar para tus historias.</h2>
             <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-muted-foreground">Tu biblioteca personal puede empezar con un solo libro.</p>
             <div className="mt-8 flex flex-col justify-center gap-3 min-[400px]:flex-row">
               <Link to={primaryTo} className={cn(buttonVariants(), primaryLink)}>{primaryLabel}</Link>
@@ -108,7 +108,7 @@ export function LandingPage({ authenticated = false }) {
       <footer className="border-t border-sidebar-border bg-sidebar px-4 py-7 text-sidebar-foreground sm:px-6">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
           <p className="font-heading font-semibold">Pinky</p>
-          <p className="text-xs text-sidebar-foreground/55">Un rincón tranquilo para las cosas que coleccionas.</p>
+          <p className="text-xs text-sidebar-foreground/55">Un rincón tranquilo para ti y tus tesoros.</p>
         </div>
       </footer>
     </div>
