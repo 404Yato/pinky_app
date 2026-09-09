@@ -1,6 +1,7 @@
 import {
   BOOK_SORT_FIELD,
   BOOK_SORT_FIELDS,
+  DEFAULT_BOOK_QUERY,
   READING_STATUSES,
   SORT_DIRECTION,
   SORT_DIRECTIONS,
@@ -8,6 +9,10 @@ import {
 
 const clone = (value) => structuredClone(value);
 const normalize = (value) => String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es");
+
+export function normalizeBookQuery(query) {
+  return { ...DEFAULT_BOOK_QUERY, ...(query ?? {}) };
+}
 
 export function searchBookCollection(collection, query) {
   const normalizedQuery = normalize(query).trim();
@@ -42,5 +47,9 @@ export function sortBookCollection(collection, { sortBy = BOOK_SORT_FIELD.CREATE
 }
 
 export function queryBookCollection(collection, query) {
-  return sortBookCollection(filterBookCollection(searchBookCollection(collection, query.search), query), query);
+  const normalizedQuery = normalizeBookQuery(query);
+  return sortBookCollection(
+    filterBookCollection(searchBookCollection(collection, normalizedQuery.search), normalizedQuery),
+    normalizedQuery,
+  );
 }
