@@ -1,15 +1,15 @@
 import {
-  bookApiResponseToViewModel,
+  normalizeBookItem,
   bookCreateCommandToApiPayload,
   bookFormToCreateCommand,
   bookFormToUpdateCommand,
-  bookMutationResponseToViewModel,
+  bookMutationResponseToItem,
   bookUpdateCommandToApiPayload,
 } from "../../adapters/books.js";
 import { DEFAULT_BOOK_QUERY } from "../../constants/books.js";
 import { ITEM_TYPE_ID } from "../../constants/items.js";
 import { apiRequest, ApiError } from "../../lib/api/client.js";
-import { filterBookCollection, queryBookCollection, searchBookCollection, sortBookCollection } from "../../lib/bookQueries.js";
+import { queryBookCollection } from "../../lib/bookQueries.js";
 
 function normalizeBookError(error) {
   if (error instanceof ApiError && error.status === 404) error.code = "BOOK_NOT_FOUND";
@@ -22,33 +22,22 @@ export async function getBook(id) {
     if (response.item_type !== ITEM_TYPE_ID.BOOK || !response.details) {
       throw new ApiError("No encontramos el libro solicitado.", { status: 404, code: "BOOK_NOT_FOUND" });
     }
-    return bookApiResponseToViewModel(response);
+    return normalizeBookItem(response);
   } catch (error) {
     throw normalizeBookError(error);
   }
 }
 
-async function getAllBooks() {
+async function getBookCollection() {
   const items = await apiRequest("/inventory/items/");
-  const bookItems = items.filter((item) => item.item_type === ITEM_TYPE_ID.BOOK);
-  return Promise.all(bookItems.map((item) => getBook(item.id)));
+  return items
+    .filter((item) => item.item_type === ITEM_TYPE_ID.BOOK)
+    .map(normalizeBookItem);
 }
 
 export async function getBooks(options = {}) {
   const query = { ...DEFAULT_BOOK_QUERY, ...options };
-  return queryBookCollection(await getAllBooks(), query);
-}
-
-export async function searchBooks(query) {
-  return searchBookCollection(await getAllBooks(), query);
-}
-
-export async function filterBooks(filters = {}) {
-  return filterBookCollection(await getAllBooks(), filters);
-}
-
-export async function sortBooks(options = {}) {
-  return sortBookCollection(await getAllBooks(), options);
+  return queryBookCollection(await getBookCollection(), query);
 }
 
 export async function createBook(input) {
@@ -57,7 +46,7 @@ export async function createBook(input) {
     method: "POST",
     body: bookCreateCommandToApiPayload(command),
   });
-  return bookMutationResponseToViewModel(null, command, created);
+  return bookMutationResponseToItem(null, command, created);
 }
 
 export async function updateBook(id, input, currentBook = null) {
@@ -67,7 +56,7 @@ export async function updateBook(id, input, currentBook = null) {
     method: "PUT",
     body: bookUpdateCommandToApiPayload(command),
   });
-  return bookMutationResponseToViewModel(current, command, response);
+  return bookMutationResponseToItem(current, command, response);
 }
 
 export async function deleteBook(id, currentBook = null) {
@@ -75,8 +64,8 @@ export async function deleteBook(id, currentBook = null) {
   const response = await apiRequest(`/inventory/items/${Number(id)}/`, { method: "DELETE" });
   return {
     ...book,
-    updatedAt: response?.data?.updated_at ?? book.updatedAt,
-    deletedAt: response?.data?.deleted_at ?? new Date().toISOString(),
+    updated_at: response?.data?.updated_at ?? book.updated_at,
+    deleted_at: response?.data?.deleted_at ?? new Date().toISOString(),
   };
 }
 

@@ -5,9 +5,9 @@ import { READING_STATUS } from "../../constants/books.js";
 import { getDashboardSections, getLibraryStats, getReadingProgress } from "../../lib/dashboard.js";
 
 const books = [
-  { id: 1, createdAt: "2026-01-01T10:00:00.000Z", readingStatus: READING_STATUS.READ, favorite: true },
-  { id: 2, createdAt: "2026-03-01T10:00:00.000Z", readingStatus: READING_STATUS.READING, favorite: false },
-  { id: 3, createdAt: "2026-02-01T10:00:00.000Z", readingStatus: READING_STATUS.PENDING, favorite: true },
+  { id: 1, created_at: "2026-01-01T10:00:00.000Z", details: { reading_status: READING_STATUS.READ }, favorite: true },
+  { id: 2, created_at: "2026-03-01T10:00:00.000Z", details: { reading_status: READING_STATUS.READING }, favorite: false },
+  { id: 3, created_at: "2026-02-01T10:00:00.000Z", details: { reading_status: READING_STATUS.PENDING }, favorite: true },
 ];
 
 test("dashboard statistics derive from canonical uppercase reading statuses", () => {

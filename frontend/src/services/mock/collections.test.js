@@ -14,9 +14,9 @@ test("focused collection queries return only matching local books", async () => 
   const pending = await getBooks(focusedCollections.pending.query);
 
   assert.ok(favorites.length > 0 && favorites.every((book) => book.favorite));
-  assert.ok(read.length > 0 && read.every((book) => book.readingStatus === READING_STATUS.READ));
-  assert.ok(reading.length > 0 && reading.every((book) => book.readingStatus === READING_STATUS.READING));
-  assert.ok(pending.length > 0 && pending.every((book) => book.readingStatus === READING_STATUS.PENDING));
+  assert.ok(read.length > 0 && read.every((book) => book.details?.reading_status === READING_STATUS.READ));
+  assert.ok(reading.length > 0 && reading.every((book) => book.details?.reading_status === READING_STATUS.READING));
+  assert.ok(pending.length > 0 && pending.every((book) => book.details?.reading_status === READING_STATUS.PENDING));
 });
 
 test("favorite and reading-state changes are reflected by focused queries", async () => {

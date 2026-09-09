@@ -147,36 +147,32 @@ Friendly and translated labels may be used in the UI, but mock records, services
 
 ## Frontend Mapping Policy
 
-Canonical records use backend-compatible snake_case. React-facing view models may use camelCase and book-specific presentation names, but every conversion must be centralized in an adapter.
-
-Required Item mappings:
+API-backed collection records preserve the backend-compatible nested structure and snake_case names. Shared Item fields remain at the root, while type-specific fields remain under `details`. The frontend must not flatten or duplicate these values.
 
 ```text
-BookViewModel.id          ← Item.id
-BookViewModel.title       ← Item.name
-BookViewModel.description ← Item.description
-BookViewModel.comments    ← Item.comments
-BookViewModel.favorite    ← Item.favorite
-BookViewModel.createdAt   ← Item.created_at
-BookViewModel.updatedAt   ← Item.updated_at
-BookViewModel.deletedAt   ← Item.deleted_at
-BookViewModel.possessionStatus ← Item.possession_status
-BookViewModel.location         ← Item.location
-BookViewModel.loanedTo         ← Item.loaned_to
+item.id
+item.name
+item.description
+item.comments
+item.favorite
+item.created_at
+item.updated_at
+item.deleted_at
+item.possession_status
+item.location
+item.loaned_to
+
+item.details.author
+item.details.isbn
+item.details.publisher
+item.details.pages
+item.details.publication_year
+item.details.genre
+item.details.cover_url
+item.details.reading_status
 ```
 
-Required Book mappings:
-
-```text
-BookViewModel.author          ← Book.author
-BookViewModel.isbn            ← Book.isbn
-BookViewModel.publisher       ← Book.publisher
-BookViewModel.pages           ← Book.pages
-BookViewModel.publicationYear ← Book.publication_year
-BookViewModel.genre           ← Book.genre
-BookViewModel.coverUrl        ← Book.cover_url
-BookViewModel.readingStatus   ← Book.reading_status
-```
+Collection consumers must handle `details: null` safely so the shared Item structure remains compatible with non-book item types. Form state may use UI-oriented camelCase names such as `title`, `publicationYear`, `coverUrl`, and `readingStatus`; conversion between that temporary form shape and canonical API payloads belongs in centralized adapters.
 
 Book quote API responses are mapped to a focused view model:
 

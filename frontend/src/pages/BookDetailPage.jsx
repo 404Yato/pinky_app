@@ -72,12 +72,13 @@ export function BookDetailPage({ bookId, onBack, onEdit, onEditComments, onBookU
     }
   };
 
+  const details = book.details ?? {};
   const metadata = [
-    ["ISBN", book.isbn],
-    ["Editorial", book.publisher],
-    ["Año de publicación", book.publicationYear],
-    ["Páginas", book.pages],
-    ["Género", book.genre],
+    ["ISBN", details.isbn],
+    ["Editorial", details.publisher],
+    ["Año de publicación", details.publication_year],
+    ["Páginas", details.pages],
+    ["Género", details.genre],
   ];
 
   return (
@@ -98,11 +99,11 @@ export function BookDetailPage({ bookId, onBack, onEdit, onEditComments, onBookU
 
         <div className="min-w-0 py-1">
           <div className="flex flex-wrap items-center gap-3">
-            <BookStatus status={book.readingStatus} />
+            <BookStatus status={details.reading_status} />
             {book.favorite && <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary"><Heart aria-hidden="true" className="size-4" weight="fill" /> Favorito</span>}
           </div>
-          <h1 className="mt-5 break-words font-heading text-3xl font-semibold leading-tight tracking-tight text-foreground min-[380px]:text-4xl xl:text-5xl">{book.title}</h1>
-          <p className="mt-3 text-lg text-muted-foreground sm:text-xl">{book.author || "Autor desconocido"}</p>
+          <h1 className="mt-5 break-words font-heading text-3xl font-semibold leading-tight tracking-tight text-foreground min-[380px]:text-4xl xl:text-5xl">{book.name}</h1>
+          <p className="mt-3 text-lg text-muted-foreground sm:text-xl">{details.author || "Autor desconocido"}</p>
 
           <div className="mt-7 flex flex-col gap-3 border-y border-border py-5 min-[420px]:flex-row min-[420px]:flex-wrap">
             <Button type="button" onClick={onEdit} disabled={Boolean(updatingAction)} variant="outline" className="h-11 w-full gap-2 px-4 text-sm min-[420px]:w-auto"><PencilSimple aria-hidden="true" /> Editar</Button>
@@ -112,7 +113,7 @@ export function BookDetailPage({ bookId, onBack, onEdit, onEditComments, onBookU
 
           <div className="mt-7 w-full sm:max-w-xs">
             <label htmlFor="reading-status" className="text-sm font-semibold text-foreground">Estado de lectura</label>
-            <select id="reading-status" value={book.readingStatus} onChange={handleStatus} disabled={Boolean(updatingAction)} aria-busy={updatingAction === "status"} className="mt-2 h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20">
+            <select id="reading-status" value={details.reading_status ?? READING_STATUS.PENDING} onChange={handleStatus} disabled={Boolean(updatingAction)} aria-busy={updatingAction === "status"} className="mt-2 h-11 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/20">
               <option value={READING_STATUS.PENDING}>Pendiente</option>
               <option value={READING_STATUS.READING}>Leyendo</option>
               <option value={READING_STATUS.READ}>Leído</option>

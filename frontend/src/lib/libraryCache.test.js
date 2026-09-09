@@ -5,7 +5,7 @@ import { READING_STATUS } from "../constants/books.js";
 import { queryBookCollection } from "./bookQueries.js";
 import { createSharedRequest, removeBookFromCollection, updateCollectionQueryState, upsertBookInCollection } from "./libraryCache.js";
 
-const firstBook = { id: 1, title: "Demián", favorite: false, readingStatus: READING_STATUS.PENDING, createdAt: "2026-01-01T00:00:00Z" };
+const firstBook = { id: 1, name: "Demián", favorite: false, details: { reading_status: READING_STATUS.PENDING }, created_at: "2026-01-01T00:00:00Z" };
 
 test("shares one in-flight library load between consumers", async () => {
   let calls = 0;
@@ -27,13 +27,13 @@ test("upserts successful mutations without changing the previous collection", ()
   assert.equal(original[0].favorite, false);
   assert.equal(queryBookCollection(updated, { favorite: true })[0].id, firstBook.id);
 
-  const reading = upsertBookInCollection(updated, { ...favorite, readingStatus: READING_STATUS.READING });
+  const reading = upsertBookInCollection(updated, { ...favorite, details: { ...favorite.details, reading_status: READING_STATUS.READING } });
   assert.equal(queryBookCollection(reading, { status: READING_STATUS.READING })[0].id, firstBook.id);
   assert.deepEqual(queryBookCollection(reading, { status: READING_STATUS.PENDING }), []);
 });
 
 test("adds created books and removes deleted books from every derived view", () => {
-  const created = { id: 2, title: "Otro libro", favorite: true, readingStatus: READING_STATUS.READ, createdAt: "2026-02-01T00:00:00Z" };
+  const created = { id: 2, name: "Otro libro", favorite: true, details: { reading_status: READING_STATUS.READ }, created_at: "2026-02-01T00:00:00Z" };
   const withCreated = upsertBookInCollection([firstBook], created);
   const afterDelete = removeBookFromCollection(withCreated, created.id);
 

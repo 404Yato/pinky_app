@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { BookCover } from "@/components/books/BookCover";
 import { MarkdownEditor } from "@/components/forms/MarkdownEditor";
 import { Button } from "@/components/ui/button";
+import { bookItemToFormValues } from "@/adapters/books";
 import { READING_STATUS } from "@/constants/books";
 import { POSSESSION_STATUS, POSSESSION_STATUS_LABEL } from "@/constants/items";
 import { isValidCoverUrl } from "@/lib/bookCover";
@@ -32,7 +33,7 @@ const emptyBook = {
 
 function getInitialValues(book) {
   if (!book) return emptyBook;
-  return Object.fromEntries(Object.keys(emptyBook).map((field) => [field, book[field] ?? emptyBook[field]]));
+  return { ...emptyBook, ...bookItemToFormValues(book) };
 }
 
 export function BookForm({ book = null, onSubmit, onCancel }) {
@@ -227,7 +228,7 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
               <div className="mt-4">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Vista previa</p>
                 <div className="aspect-[2/3] w-28 overflow-hidden rounded-md border border-border bg-secondary shadow-[0_5px_18px_rgb(59_42_32_/_0.08)] sm:w-32">
-                  <BookCover book={{ id: book?.id ?? 0, title: values.title || "Nuevo libro", author: values.author, coverUrl: values.coverUrl.trim() }} />
+                  <BookCover book={{ id: book?.id ?? 0, name: values.title || "Nuevo libro", details: { author: values.author, cover_url: values.coverUrl.trim() } }} />
                 </div>
               </div>
             )}

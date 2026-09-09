@@ -1,22 +1,32 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { bookApiResponseToViewModel, bookCreateCommandToApiPayload, bookFormToCreateCommand, bookFormToUpdateCommand, bookMutationResponseToViewModel } from "./books.js";
+import { bookCreateCommandToApiPayload, bookFormToCreateCommand, bookFormToUpdateCommand, bookItemToFormValues, bookMutationResponseToItem, normalizeBookItem } from "./books.js";
 
-test("maps an API item with details to BookViewModel", () => {
-  const book = bookApiResponseToViewModel({
-    id: 3, user: 2, item_type: 1, name: "Piranesi", description: "", comments: "Lo leí en **invierno**.", favorite: true, possession_status: "LOANED", location: "Repisa 2", loaned_to: "Nicolás",
-    created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-02T00:00:00Z", deleted_at: null,
-    details: { item: 3, author: "Susanna Clarke", isbn: null, publisher: null, pages: 272, publication_year: 2020, genre: null, cover_url: null, reading_status: "READ" },
-  });
-  assert.equal(book.title, "Piranesi");
-  assert.equal(book.favorite, true);
-  assert.equal(book.comments, "Lo leí en **invierno**.");
-  assert.equal(book.pages, 272);
-  assert.equal(book.readingStatus, "READ");
-  assert.equal(book.possessionStatus, "LOANED");
-  assert.equal(book.location, "Repisa 2");
-  assert.equal(book.loanedTo, "Nicolás");
+const apiItem = {
+  id: 3, item_type: 1, name: "Piranesi", description: "", comments: "Lo leí en **invierno**.", favorite: true,
+  possession_status: "LOANED", location: "Repisa 2", loaned_to: "Nicolás", created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-02T00:00:00Z", deleted_at: null,
+  details: { item: 3, author: "Susanna Clarke", isbn: null, publisher: null, pages: 272, publication_year: 2020, genre: null, cover_url: null, reading_status: "READ" },
+};
+
+test("normalizes an API book while preserving nested details", () => {
+  const item = normalizeBookItem(apiItem);
+  assert.equal(item.name, "Piranesi");
+  assert.equal(item.details.pages, 272);
+  assert.equal(item.details.reading_status, "READ");
+  assert.equal(Object.hasOwn(item, "author"), false);
+});
+
+test("keeps missing details null", () => {
+  assert.equal(normalizeBookItem({ id: 9, item_type: 1, name: "Sin ficha" }).details, null);
+});
+
+test("maps canonical nested items to UI-only form values", () => {
+  const values = bookItemToFormValues(apiItem);
+  assert.equal(values.title, "Piranesi");
+  assert.equal(values.author, "Susanna Clarke");
+  assert.equal(values.publicationYear, 2020);
+  assert.equal(values.possessionStatus, "LOANED");
 });
 
 test("maps create commands to the generic item payload", () => {
@@ -26,11 +36,7 @@ test("maps create commands to the generic item payload", () => {
   assert.equal(payload.details.pages, 272);
   assert.equal(payload.details.reading_status, "PENDING");
   assert.equal(payload.details.cover_url, "https://example.com/piranesi");
-  assert.equal(payload.favorite, false);
   assert.equal(payload.comments, "Una nota con **Markdown**.");
-  assert.equal(payload.possession_status, "OWNED");
-  assert.equal(payload.location, null);
-  assert.equal(payload.loaned_to, null);
 });
 
 test("maps replacing and removing a cover URL in update commands", () => {
@@ -44,16 +50,13 @@ test("keeps comments on Item and preserves Markdown during updates", () => {
   assert.equal(Object.hasOwn(command.book, "comments"), false);
 });
 
-test("maps update envelopes and empty success responses without losing existing fields", () => {
-  const current = { id: 3, title: "Old", description: "", favorite: false, createdAt: "created", updatedAt: "old", deletedAt: null, possessionStatus: "LOANED", location: "Repisa", loanedTo: "Ana", author: "Author", isbn: null, publisher: null, pages: 100, publicationYear: 2020, genre: null, coverUrl: "cover", readingStatus: "PENDING" };
-  const command = { item: { name: "New", possession_status: "OWNED", loaned_to: null }, book: { pages: 120 } };
-  const fromEnvelope = bookMutationResponseToViewModel(current, command, { data: { id: 3, name: "New", updated_at: "new" } });
-  const fromEmpty = bookMutationResponseToViewModel(current, command, null);
-  assert.equal(fromEnvelope.title, "New");
-  assert.equal(fromEnvelope.updatedAt, "new");
-  assert.equal(fromEmpty.title, "New");
-  assert.equal(fromEmpty.pages, 120);
-  assert.equal(fromEmpty.coverUrl, "cover");
-  assert.equal(fromEmpty.possessionStatus, "OWNED");
-  assert.equal(fromEmpty.loanedTo, null);
+test("reconciles mutation responses without flattening or refetching details", () => {
+  const command = { item: { name: "Nuevo", possession_status: "OWNED", loaned_to: null }, book: { pages: 320 } };
+  const updated = bookMutationResponseToItem(apiItem, command, { data: { id: 3, name: "Nuevo", updated_at: "new" } });
+  assert.equal(updated.name, "Nuevo");
+  assert.equal(updated.updated_at, "new");
+  assert.equal(updated.details.pages, 320);
+  assert.equal(updated.details.author, "Susanna Clarke");
+  assert.equal(updated.loaned_to, null);
+  assert.equal(Object.hasOwn(updated, "pages"), false);
 });

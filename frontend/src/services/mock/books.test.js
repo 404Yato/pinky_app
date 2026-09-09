@@ -4,7 +4,7 @@ import { beforeEach, describe, test } from "node:test";
 import {
   bookFormToCreateCommand,
   bookFormToUpdateCommand,
-  bookRecordToViewModel,
+  normalizeBookItem,
 } from "../../adapters/books.js";
 import { BOOK_SORT_FIELD, READING_STATUS, SORT_DIRECTION } from "../../constants/books.js";
 import { ITEM_TYPE_ID } from "../../constants/items.js";
@@ -31,14 +31,14 @@ describe("mock book queries", () => {
     const books = await getBooks();
     assert.equal(books.length, 20);
 
-    books[0].title = "Título alterado";
+    books[0].name = "Título alterado";
     const freshBooks = await getBooks();
-    assert.notEqual(freshBooks[0].title, "Título alterado");
+    assert.notEqual(freshBooks[0].name, "Título alterado");
     assert.notEqual(mockBooks[0].item.name, "Título alterado");
   });
 
   test("gets a single book and reports missing IDs consistently", async () => {
-    assert.equal((await getBook(1)).title, "Cien años de soledad");
+    assert.equal((await getBook(1)).name, "Cien años de soledad");
 
     await assert.rejects(() => getBook(999), (error) => {
       assert.ok(error instanceof MockBookServiceError);
@@ -73,7 +73,7 @@ describe("mock book queries", () => {
       sortDirection: SORT_DIRECTION.ASCENDING,
     });
 
-    assert.equal(sorted[0].title, "Cien años de soledad");
+    assert.equal(sorted[0].name, "Cien años de soledad");
     assert.equal((await getBooks())[0].id, 20);
   });
 });
@@ -103,17 +103,16 @@ describe("canonical book adapters", () => {
     assert.equal(Object.hasOwn(record.book, "name"), false);
   });
 
-  test("maps canonical records to the stable BookViewModel", () => {
-    const viewModel = bookRecordToViewModel(mockBooks[0]);
+  test("maps mock records to the canonical nested Item structure", () => {
+    const item = normalizeBookItem({ ...mockBooks[0].item, details: mockBooks[0].book });
 
-    assert.equal(viewModel.title, mockBooks[0].item.name);
-    assert.equal(viewModel.favorite, mockBooks[0].item.favorite);
-    assert.equal(viewModel.description, mockBooks[0].item.description);
-    assert.equal(viewModel.comments, mockBooks[0].item.comments);
-    assert.equal(viewModel.createdAt, mockBooks[0].item.created_at);
-    assert.equal(viewModel.publicationYear, mockBooks[0].book.publication_year);
-    assert.equal(viewModel.readingStatus, "READ");
-    assert.equal(viewModel.possessionStatus, "OWNED");
+    assert.equal(item.name, mockBooks[0].item.name);
+    assert.equal(item.favorite, mockBooks[0].item.favorite);
+    assert.equal(item.created_at, mockBooks[0].item.created_at);
+    assert.equal(item.details.publication_year, mockBooks[0].book.publication_year);
+    assert.equal(item.details.reading_status, "READ");
+    assert.equal(item.possession_status, "OWNED");
+    assert.equal(Object.hasOwn(item, "author"), false);
   });
 
   test("maps form values into separate Item and Book create data", () => {
@@ -167,14 +166,14 @@ describe("mock book mutations", () => {
     const created = await createBook({ title: "  Un libro nuevo  ", pages: "240" });
 
     assert.equal(created.id, 21);
-    assert.equal(created.title, "Un libro nuevo");
-    assert.equal(created.pages, 240);
-    assert.equal(created.readingStatus, READING_STATUS.PENDING);
+    assert.equal(created.name, "Un libro nuevo");
+    assert.equal(created.details.pages, 240);
+    assert.equal(created.details.reading_status, READING_STATUS.PENDING);
     assert.equal(created.favorite, false);
     assert.equal(created.description, "");
     assert.equal(created.comments, "");
-    assert.equal(created.deletedAt, null);
-    assert.equal(created.createdAt, created.updatedAt);
+    assert.equal(created.deleted_at, null);
+    assert.equal(created.created_at, created.updated_at);
     assert.equal((await getBooks()).length, 21);
   });
 
@@ -187,17 +186,17 @@ describe("mock book mutations", () => {
     });
 
     assert.equal(updated.id, 3);
-    assert.equal(updated.createdAt, original.createdAt);
-    assert.equal(updated.title, "Nuevo título");
-    assert.equal(updated.author, "Nueva autora");
+    assert.equal(updated.created_at, original.created_at);
+    assert.equal(updated.name, "Nuevo título");
+    assert.equal(updated.details.author, "Nueva autora");
   });
 
   test("soft deletes and excludes the selected record from active operations", async () => {
     const deleted = await deleteBook(4);
 
     assert.equal(deleted.id, 4);
-    assert.ok(deleted.deletedAt);
-    assert.equal(deleted.deletedAt, deleted.updatedAt);
+    assert.ok(deleted.deleted_at);
+    assert.equal(deleted.deleted_at, deleted.updated_at);
     await assert.rejects(() => getBook(4), { code: "BOOK_NOT_FOUND" });
     assert.equal((await getBooks()).length, 19);
     assert.equal((await searchBooks("Pedro Páramo")).length, 0);
@@ -210,7 +209,7 @@ describe("mock book mutations", () => {
     const changed = await updateReadingStatus(2, READING_STATUS.READ);
 
     assert.equal(toggled.favorite, !original.favorite);
-    assert.equal(changed.readingStatus, READING_STATUS.READ);
+    assert.equal(changed.details.reading_status, READING_STATUS.READ);
   });
 
   test("rejects invalid writes with actionable error codes", async () => {
@@ -226,7 +225,7 @@ describe("mock book mutations", () => {
     resetMockBooks();
 
     assert.equal((await getBooks()).length, mockBooks.length);
-    assert.equal((await getBook(1)).title, mockBooks[0].item.name);
+    assert.equal((await getBook(1)).name, mockBooks[0].item.name);
   });
 
   test("preserves soft-deleted records when generating new IDs", async () => {

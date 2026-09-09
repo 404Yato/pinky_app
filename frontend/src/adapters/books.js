@@ -48,30 +48,6 @@ function bookFormToCommand(values) {
   };
 }
 
-export function bookRecordToViewModel(record) {
-  return {
-    id: record.item.id,
-    title: record.item.name,
-    description: record.item.description,
-    comments: record.item.comments ?? "",
-    favorite: record.item.favorite,
-    createdAt: record.item.created_at,
-    updatedAt: record.item.updated_at,
-    deletedAt: record.item.deleted_at,
-    possessionStatus: record.item.possession_status,
-    location: record.item.location,
-    loanedTo: record.item.loaned_to,
-    author: record.book.author,
-    isbn: record.book.isbn,
-    publisher: record.book.publisher,
-    pages: record.book.pages,
-    publicationYear: record.book.publication_year,
-    genre: record.book.genre,
-    coverUrl: record.book.cover_url,
-    readingStatus: record.book.reading_status,
-  };
-}
-
 export function bookFormToCreateCommand(values) {
   return bookFormToCommand(values);
 }
@@ -110,20 +86,20 @@ export function bookFormToUpdateCommand(values) {
   return { item, book };
 }
 
-export function bookApiResponseToRecord(response) {
-  const { details = {}, ...item } = response ?? {};
+export function normalizeBookItem(response) {
+  const item = response?.data ?? response ?? {};
+  const details = item.details;
   return {
-    item: {
-      ...item,
-      description: item.description ?? "",
-      comments: item.comments ?? "",
-      favorite: Boolean(item.favorite),
-      possession_status: item.possession_status ?? POSSESSION_STATUS.OWNED,
-      location: item.location ?? null,
-      loaned_to: item.loaned_to ?? null,
-      deleted_at: item.deleted_at ?? null,
-    },
-    book: {
+    ...item,
+    description: item.description ?? "",
+    comments: item.comments ?? "",
+    favorite: Boolean(item.favorite),
+    possession_status: item.possession_status ?? POSSESSION_STATUS.OWNED,
+    location: item.location ?? null,
+    loaned_to: item.loaned_to ?? null,
+    deleted_at: item.deleted_at ?? null,
+    details: details == null ? null : {
+      ...details,
       item: details.item ?? item.id,
       isbn: details.isbn ?? null,
       author: details.author ?? null,
@@ -137,8 +113,25 @@ export function bookApiResponseToRecord(response) {
   };
 }
 
-export function bookApiResponseToViewModel(response) {
-  return bookRecordToViewModel(bookApiResponseToRecord(response));
+export function bookItemToFormValues(item) {
+  const details = item?.details ?? {};
+  return {
+    title: item?.name ?? "",
+    description: item?.description ?? "",
+    comments: item?.comments ?? "",
+    favorite: Boolean(item?.favorite),
+    possessionStatus: item?.possession_status ?? POSSESSION_STATUS.OWNED,
+    location: item?.location ?? "",
+    loanedTo: item?.loaned_to ?? "",
+    isbn: details.isbn ?? "",
+    author: details.author ?? "",
+    publisher: details.publisher ?? "",
+    pages: details.pages ?? "",
+    publicationYear: details.publication_year ?? "",
+    genre: details.genre ?? "",
+    coverUrl: details.cover_url ?? "",
+    readingStatus: details.reading_status ?? READING_STATUS.PENDING,
+  };
 }
 
 export function bookCreateCommandToApiPayload(command) {
@@ -153,30 +146,24 @@ export function bookUpdateCommandToApiPayload(command) {
   return { ...command.item, details: command.book };
 }
 
-const commandValue = (values, field, fallback) => Object.hasOwn(values, field) ? values[field] : fallback;
+export function bookMutationResponseToItem(currentItem, command, response) {
+  const serverItem = response?.data ?? response ?? {};
+  const current = currentItem ?? {};
+  const currentDetails = current.details ?? {};
+  const serverDetails = serverItem.details ?? {};
+  const id = serverItem.id ?? current.id;
 
-export function bookMutationResponseToViewModel(currentBook, command, response) {
-  const item = response?.data ?? response ?? {};
-  const current = currentBook ?? {};
-  return {
-    id: item.id ?? current.id,
-    title: item.name ?? commandValue(command.item, "name", current.title),
-    description: item.description ?? commandValue(command.item, "description", current.description ?? ""),
-    comments: item.comments ?? commandValue(command.item, "comments", current.comments ?? ""),
-    favorite: item.favorite ?? commandValue(command.item, "favorite", current.favorite ?? false),
-    createdAt: item.created_at ?? current.createdAt ?? null,
-    updatedAt: item.updated_at ?? current.updatedAt ?? null,
-    deletedAt: item.deleted_at ?? current.deletedAt ?? null,
-    possessionStatus: item.possession_status ?? commandValue(command.item, "possession_status", current.possessionStatus ?? POSSESSION_STATUS.OWNED),
-    location: item.location ?? commandValue(command.item, "location", current.location ?? null),
-    loanedTo: item.loaned_to ?? commandValue(command.item, "loaned_to", current.loanedTo ?? null),
-    author: commandValue(command.book, "author", current.author ?? null),
-    isbn: commandValue(command.book, "isbn", current.isbn ?? null),
-    publisher: commandValue(command.book, "publisher", current.publisher ?? null),
-    pages: commandValue(command.book, "pages", current.pages ?? null),
-    publicationYear: commandValue(command.book, "publication_year", current.publicationYear ?? null),
-    genre: commandValue(command.book, "genre", current.genre ?? null),
-    coverUrl: commandValue(command.book, "cover_url", current.coverUrl ?? null),
-    readingStatus: commandValue(command.book, "reading_status", current.readingStatus ?? READING_STATUS.PENDING),
-  };
+  return normalizeBookItem({
+    ...current,
+    ...command.item,
+    ...serverItem,
+    id,
+    item_type: serverItem.item_type ?? current.item_type ?? ITEM_TYPE_ID.BOOK,
+    details: {
+      ...currentDetails,
+      ...command.book,
+      ...serverDetails,
+      item: serverDetails.item ?? currentDetails.item ?? id,
+    },
+  });
 }

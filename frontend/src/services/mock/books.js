@@ -1,19 +1,15 @@
 import {
   bookFormToCreateCommand,
   bookFormToUpdateCommand,
-  bookRecordToViewModel,
+  normalizeBookItem,
 } from "../../adapters/books.js";
 import {
-  BOOK_SORT_FIELD,
-  BOOK_SORT_FIELDS,
   DEFAULT_BOOK_QUERY,
-  READING_STATUS,
   READING_STATUSES,
-  SORT_DIRECTION,
-  SORT_DIRECTIONS,
 } from "../../constants/books.js";
 import { ITEM_TYPE_ID, MOCK_USER_ID } from "../../constants/items.js";
 import { mockBooks } from "../../data/mockBooks.js";
+import { filterBookCollection, queryBookCollection, searchBookCollection, sortBookCollection } from "../../lib/bookQueries.js";
 
 export class MockBookServiceError extends Error {
   constructor(message, code = "MOCK_BOOK_ERROR") {
@@ -24,12 +20,6 @@ export class MockBookServiceError extends Error {
 }
 
 const clone = (value) => structuredClone(value);
-const normalizeForSearch = (value) =>
-  String(value ?? "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase("es");
-
 let records = clone(mockBooks);
 
 function findRecordIndex(id, { includeDeleted = false } = {}) {
@@ -67,87 +57,35 @@ function validateRecord(record) {
   validateStatus(record.book.reading_status);
 }
 
-function activeViewModels() {
+function recordToItem(record) {
+  return normalizeBookItem({ ...record.item, details: record.book });
+}
+
+function activeItems() {
   return records
     .filter((record) => record.item.deleted_at === null)
-    .map(bookRecordToViewModel);
-}
-
-function applySearch(collection, query) {
-  const normalizedQuery = normalizeForSearch(query).trim();
-  if (!normalizedQuery) return clone(collection);
-
-  return clone(
-    collection.filter((book) =>
-      [book.title, book.author, book.genre, book.publisher, book.isbn].some((value) =>
-        normalizeForSearch(value).includes(normalizedQuery),
-      ),
-    ),
-  );
-}
-
-function applyFilters(collection, { status = null, favorite = null, genre = null } = {}) {
-  if (status !== null) validateStatus(status);
-  const normalizedGenre = normalizeForSearch(genre).trim();
-
-  return clone(
-    collection.filter((book) => {
-      if (status !== null && book.readingStatus !== status) return false;
-      if (favorite !== null && book.favorite !== favorite) return false;
-      if (normalizedGenre && normalizeForSearch(book.genre) !== normalizedGenre) return false;
-      return true;
-    }),
-  );
-}
-
-function applySort(
-  collection,
-  { sortBy = BOOK_SORT_FIELD.CREATED_AT, sortDirection = SORT_DIRECTION.DESCENDING } = {},
-) {
-  if (!BOOK_SORT_FIELDS.includes(sortBy)) {
-    throw new MockBookServiceError("El criterio de orden no es válido.", "INVALID_SORT_FIELD");
-  }
-  if (!SORT_DIRECTIONS.includes(sortDirection)) {
-    throw new MockBookServiceError("La dirección de orden no es válida.", "INVALID_SORT_DIRECTION");
-  }
-
-  const direction = sortDirection === SORT_DIRECTION.ASCENDING ? 1 : -1;
-  const sorted = clone(collection);
-  sorted.sort((first, second) => {
-    const firstValue = first[sortBy];
-    const secondValue = second[sortBy];
-    if (firstValue === secondValue) return first.id - second.id;
-    if (firstValue === null || firstValue === undefined) return 1;
-    if (secondValue === null || secondValue === undefined) return -1;
-    if (typeof firstValue === "string" && !sortBy.endsWith("At")) {
-      return firstValue.localeCompare(secondValue, "es", { sensitivity: "base" }) * direction;
-    }
-    return (firstValue < secondValue ? -1 : 1) * direction;
-  });
-  return sorted;
+    .map(recordToItem);
 }
 
 export async function getBooks(options = {}) {
   const query = { ...DEFAULT_BOOK_QUERY, ...options };
-  let result = applySearch(activeViewModels(), query.search);
-  result = applyFilters(result, query);
-  return applySort(result, query);
+  return queryBookCollection(activeItems(), query);
 }
 
 export async function searchBooks(query) {
-  return applySearch(activeViewModels(), query);
+  return searchBookCollection(activeItems(), query);
 }
 
 export async function filterBooks(filters = {}) {
-  return applyFilters(activeViewModels(), filters);
+  return filterBookCollection(activeItems(), filters);
 }
 
 export async function sortBooks(options = {}) {
-  return applySort(activeViewModels(), options);
+  return sortBookCollection(activeItems(), options);
 }
 
 export async function getBook(id) {
-  return clone(bookRecordToViewModel(records[findRecordIndex(id)]));
+  return clone(recordToItem(records[findRecordIndex(id)]));
 }
 
 export async function createBook(input) {
@@ -172,7 +110,7 @@ export async function createBook(input) {
 
   validateRecord(record);
   records = [...records, record];
-  return clone(bookRecordToViewModel(record));
+  return clone(recordToItem(record));
 }
 
 export async function updateBook(id, input) {
@@ -199,7 +137,7 @@ export async function updateBook(id, input) {
 
   validateRecord(updatedRecord);
   records = records.map((record, recordIndex) => (recordIndex === index ? updatedRecord : record));
-  return clone(bookRecordToViewModel(updatedRecord));
+  return clone(recordToItem(updatedRecord));
 }
 
 export async function deleteBook(id) {
@@ -215,7 +153,7 @@ export async function deleteBook(id) {
   };
 
   records = records.map((record, recordIndex) => (recordIndex === index ? deletedRecord : record));
-  return clone(bookRecordToViewModel(deletedRecord));
+  return clone(recordToItem(deletedRecord));
 }
 
 export async function toggleFavorite(id) {
@@ -229,7 +167,7 @@ export async function toggleFavorite(id) {
     },
   };
   records = records.map((record, recordIndex) => (recordIndex === index ? updatedRecord : record));
-  return clone(bookRecordToViewModel(updatedRecord));
+  return clone(recordToItem(updatedRecord));
 }
 
 export async function updateReadingStatus(id, status) {

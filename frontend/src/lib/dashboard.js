@@ -1,7 +1,7 @@
 import { READING_STATUS } from "../constants/books.js";
 
 const byNewest = (first, second) => {
-  const difference = Date.parse(second.createdAt) - Date.parse(first.createdAt);
+  const difference = Date.parse(second.created_at) - Date.parse(first.created_at);
   return Number.isNaN(difference) ? second.id - first.id : difference || second.id - first.id;
 };
 
@@ -10,9 +10,9 @@ export function getLibraryStats(books) {
     (stats, book) => {
       stats.total += 1;
       if (book.favorite) stats.favorites += 1;
-      if (book.readingStatus === READING_STATUS.READ) stats.read += 1;
-      if (book.readingStatus === READING_STATUS.READING) stats.reading += 1;
-      if (book.readingStatus === READING_STATUS.PENDING) stats.pending += 1;
+      if (book.details?.reading_status === READING_STATUS.READ) stats.read += 1;
+      if (book.details?.reading_status === READING_STATUS.READING) stats.reading += 1;
+      if (book.details?.reading_status === READING_STATUS.PENDING) stats.pending += 1;
       return stats;
     },
     { total: 0, read: 0, reading: 0, pending: 0, favorites: 0 },
@@ -24,7 +24,7 @@ export function getDashboardSections(books, limit = 4) {
 
   return {
     recent: newest.slice(0, limit),
-    reading: newest.filter((book) => book.readingStatus === READING_STATUS.READING).slice(0, limit),
+    reading: newest.filter((book) => book.details?.reading_status === READING_STATUS.READING).slice(0, limit),
     favorites: newest.filter((book) => book.favorite).slice(0, limit),
   };
 }

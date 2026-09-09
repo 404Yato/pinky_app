@@ -5,9 +5,9 @@ import { BookStatus } from "@/components/books/BookStatus";
 import { READING_STATUS } from "@/constants/books";
 
 const previewBooks = [
-  { id: 1, title: "Cien años de soledad", author: "Gabriel García Márquez", coverUrl: null, readingStatus: READING_STATUS.READ, favorite: true },
-  { id: 5, title: "Piranesi", author: "Susanna Clarke", coverUrl: null, readingStatus: READING_STATUS.READING, favorite: false },
-  { id: 3, title: "La mano izquierda de la oscuridad", author: "Ursula K. Le Guin", coverUrl: null, readingStatus: READING_STATUS.PENDING, favorite: false },
+  { id: 1, name: "Cien años de soledad", details: { author: "Gabriel García Márquez", cover_url: null, reading_status: READING_STATUS.READ }, favorite: true },
+  { id: 5, name: "Piranesi", details: { author: "Susanna Clarke", cover_url: null, reading_status: READING_STATUS.READING }, favorite: false },
+  { id: 3, name: "La mano izquierda de la oscuridad", details: { author: "Ursula K. Le Guin", cover_url: null, reading_status: READING_STATUS.PENDING }, favorite: false },
 ];
 
 export function LandingPreview() {
@@ -32,8 +32,8 @@ export function LandingPreview() {
                   {book.favorite && <span aria-label="Favorito" className="absolute right-1.5 top-1.5 grid size-7 place-items-center rounded-full bg-card/90 text-accent shadow-sm"><Heart aria-hidden="true" className="size-3.5" weight="fill" /></span>}
                 </div>
                 <div className="p-2.5">
-                  <p className="truncate font-heading text-xs font-semibold sm:text-sm">{book.title}</p>
-                  <div className="mt-2 origin-left scale-[0.82] sm:scale-90"><BookStatus status={book.readingStatus} /></div>
+                  <p className="truncate font-heading text-xs font-semibold sm:text-sm">{book.name}</p>
+                  <div className="mt-2 origin-left scale-[0.82] sm:scale-90"><BookStatus status={book.details?.reading_status} /></div>
                 </div>
               </article>
             ))}

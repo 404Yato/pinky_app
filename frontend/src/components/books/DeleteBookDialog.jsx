@@ -48,7 +48,7 @@ export function DeleteBookDialog({ book, open, onClose, onDeleted }) {
       <div className="p-5 sm:p-7">
         <span className="grid size-12 place-items-center rounded-full bg-destructive/10 text-destructive"><Trash aria-hidden="true" className="size-6" weight="duotone" /></span>
         <h2 id="delete-book-title" className="mt-5 font-heading text-2xl font-semibold">¿Eliminar este libro?</h2>
-        <p id="delete-book-description" className="mt-2 text-sm leading-6 text-muted-foreground">“{book.title}” dejará de aparecer en tu biblioteca durante esta sesión.</p>
+        <p id="delete-book-description" className="mt-2 text-sm leading-6 text-muted-foreground">“{book.name}” dejará de aparecer en tu biblioteca durante esta sesión.</p>
         {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
         <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button ref={cancelButtonRef} type="button" variant="outline" onClick={onClose} disabled={deleting} className="h-11 px-5 text-sm">Conservar libro</Button>
