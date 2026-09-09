@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from drf_spectacular.utils import (extend_schema, OpenApiResponse, OpenApiExample)
-from .serializers import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, WhoAmIResponseSerializer, BookQuoteSerializer
+from .serializers import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, WhoAmIResponseSerializer, BookQuoteSerializer, ItemListSerializer
 from .services import get_items, add_item, get_item, update_item, delete_item
 from .models import Book, BookQuote
 
@@ -26,7 +26,7 @@ class ItemListView(APIView):
         description="Devuelve todos los items registrados por el usuario autenticado. " \
                     "No devuelve elementos eliminados mediante soft delete.",
         responses={
-            200: ItemSerializer(many=True),
+            200: ItemListSerializer(many=True),
             401: OpenApiResponse(
                 description="El usuario no está autenticado."
             ),

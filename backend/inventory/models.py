@@ -86,7 +86,8 @@ class Book(models.Model):
     item = models.OneToOneField(
         Item,
         on_delete=models.CASCADE,
-        primary_key=True
+        primary_key=True,
+        related_name="book_details"
     )
 
     isbn = models.CharField(
@@ -143,7 +144,8 @@ class Vinyl(models.Model):
     item = models.OneToOneField(
         Item,
         on_delete=models.CASCADE,
-        primary_key=True
+        primary_key=True,
+        related_name="vinyl_details"
     )
 
     artist = models.CharField(

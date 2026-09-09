@@ -17,13 +17,23 @@ DETAIL_SERIALIZER = {
 }
 
 def get_items(user):
-    # Return only active items owned by the current user.
-    items = models.Item.objects.filter(
-        user=user,
-        deleted_at__isnull=True
+    items = (
+        models.Item.objects
+        .filter(
+            user=user,
+            deleted_at__isnull=True
+        )
+        .select_related(
+            "item_type",
+            "book_details",
+            "vinyl_details",
+        )
     )
 
-    serializer = serializers.ItemSerializer(items, many = True)
+    serializer = serializers.ItemListSerializer(
+        items,
+        many=True
+    )
 
     return serializer.data
 

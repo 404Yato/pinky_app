@@ -7,6 +7,34 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = '__all__'
 
+class ItemListSerializer(serializers.ModelSerializer):
+    details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Item
+        fields = [
+            "id",
+            "item_type",
+            "name",
+            "description",
+            "favorite",
+            "possession_status",
+            "location",
+            "loaned_to",
+            "created_at",
+            "updated_at",
+            "details",
+        ]
+
+    def get_details(self, obj):
+        if hasattr(obj, "book_details"):
+            return BookSerializer(obj.book_details).data
+
+        if hasattr(obj, "vinyl_details"):
+            return VinylSerializer(obj.vinyl_details).data
+
+        return None
+
 class ItemTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
