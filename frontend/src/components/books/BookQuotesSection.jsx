@@ -70,7 +70,7 @@ export function BookQuotesSection({ bookId }) {
           {quotes.map((quote) => (
             <li key={quote.id} className="flex min-w-0 flex-col rounded-lg border border-border bg-card p-5 shadow-[0_5px_18px_rgb(59_42_32_/_0.06)] sm:p-6">
               <blockquote className="min-w-0 flex-1 whitespace-pre-line break-words font-heading text-lg leading-8 text-foreground">
-                <span aria-hidden="true" className="mr-1 text-2xl text-primary">❝</span>{quote.text}
+                <span aria-hidden="true" className="mr-1 text-2xl text-primary">❝</span>{quote.text}<span aria-hidden="true" className="mr-1 text-2xl text-primary">❞</span>
               </blockquote>
               <div className="mt-5 flex min-h-10 items-end justify-between gap-3 border-t border-border pt-4">
                 {quote.page !== null && quote.page !== undefined ? <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Página {quote.page}</p> : <span />}
