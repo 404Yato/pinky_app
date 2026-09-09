@@ -87,6 +87,7 @@ The current Pinky frontend implements books only. Vinyl is documented here so th
 | `item_type` | integer / foreign key | No | References `ItemType` |
 | `name` | string | No | Shared display name; exposed as `title` by the book view model |
 | `description` | string | No | Shared description; use an empty string when absent |
+| `comments` | Markdown string | No | User-authored personal notes shared by every Item type; use an empty string when absent |
 | `favorite` | boolean | No | Shared favorite state; never belongs to Book or Vinyl |
 | `possession_status` | enum string | No | Shared possession state; one of `OWNED` or `LOANED`, defaulting to `OWNED` |
 | `location` | string | Yes | Normal or assigned physical location; up to 255 characters |
@@ -154,6 +155,7 @@ Required Item mappings:
 BookViewModel.id          ← Item.id
 BookViewModel.title       ← Item.name
 BookViewModel.description ← Item.description
+BookViewModel.comments    ← Item.comments
 BookViewModel.favorite    ← Item.favorite
 BookViewModel.createdAt   ← Item.created_at
 BookViewModel.updatedAt   ← Item.updated_at
@@ -188,7 +190,7 @@ BookQuoteViewModel.updatedAt ← BookQuote.updated_at
 
 Possession status uses the exact backend values `OWNED` and `LOANED`. `location` remains independent from possession status. When a form changes away from `LOANED`, the frontend submits `loaned_to` as `null` so stale borrower data is not retained.
 
-The reverse mapping for create and update commands must explicitly send `title` to `Item.name`, `favorite` to `Item.favorite`, shared fields to Item data, and type-specific fields to Book detail data.
+The reverse mapping for create and update commands must explicitly send `title` to `Item.name`, `comments` to `Item.comments`, `favorite` to `Item.favorite`, shared fields to Item data, and type-specific fields to Book detail data. `comments` is stored and transported as Markdown source, never as persisted HTML.
 
 Form controls may temporarily hold numeric input as strings. Command adapters must convert those values to numbers or `null` before domain storage. Nullable Book and Vinyl fields use `null`; absent `Item.description` uses an empty string.
 
