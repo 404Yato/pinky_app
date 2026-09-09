@@ -28,16 +28,20 @@ def get_items(user):
     return serializer.data
 
 def add_item(data, user):
+
     # Validate the request payload before creating the base item and its details.
     serializer = serializers.ItemCreateSerializer(
-            data = data
-        )
-    if not serializer.is_valid():
-        raise ValidationError(serializer.error)
+        data=data
+    )
+
+    serializer.is_valid(
+        raise_exception=True
+    )
 
     validated_data = serializer.validated_data
-    
+
     with transaction.atomic():
+
         # Keep item and detail creation in the same database transaction.
         item = models.Item.objects.create(
             user=user,
@@ -46,6 +50,20 @@ def add_item(data, user):
             description=validated_data.get(
                 'description',
                 ''
+            ),
+            favorite=validated_data.get(
+                'favorite',
+                False
+            ),
+            possession_status=validated_data.get(
+                'possession_status',
+                'OWNED'
+            ),
+            location=validated_data.get(
+                'location'
+            ),
+            loaned_to=validated_data.get(
+                'loaned_to'
             )
         )
 

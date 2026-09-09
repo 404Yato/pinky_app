@@ -34,7 +34,7 @@ class ItemCreateSerializer(serializers.Serializer):
         required=False,
         allow_blank=True
     )
-    favorite = serializers.BooleanField(),
+    favorite = serializers.BooleanField()
     possession_status = serializers.CharField(
         required=False,
         allow_blank=True
