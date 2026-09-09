@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
 
+import { BookCover } from "@/components/books/BookCover";
 import { Button } from "@/components/ui/button";
 import { READING_STATUS } from "@/constants/books";
 import { POSSESSION_STATUS, POSSESSION_STATUS_LABEL } from "@/constants/items";
+import { isValidCoverUrl } from "@/lib/bookCover";
 
 const inputClassName = "mt-2 h-11 w-full rounded-md border border-input bg-background px-3 font-normal text-foreground outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20 aria-invalid:border-destructive aria-invalid:ring-destructive/20";
 
@@ -20,6 +22,7 @@ const emptyBook = {
   possessionStatus: POSSESSION_STATUS.OWNED,
   location: "",
   loanedTo: "",
+  coverUrl: "",
 };
 
 function getInitialValues(book) {
@@ -52,6 +55,7 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
     if (values.publicationYear !== "" && (!Number.isInteger(Number(values.publicationYear)) || Number(values.publicationYear) < 1)) {
       nextErrors.publicationYear = "Ingresa un año válido.";
     }
+    if (!isValidCoverUrl(values.coverUrl)) nextErrors.coverUrl = "Ingresa una URL completa, por ejemplo https://example.com/portada.jpg.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
       window.requestAnimationFrame(() => formRef.current?.querySelector('[aria-invalid="true"]')?.focus());
@@ -132,6 +136,33 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
           {field("isbn", "ISBN", { inputMode: "numeric" })}
           {field("publicationYear", "Año de publicación", { type: "number", min: "1", inputMode: "numeric" })}
           {field("pages", "Número de páginas", { type: "number", min: "1", inputMode: "numeric" })}
+          <div className="min-w-0 sm:col-span-2">
+            <label className="block text-sm font-semibold text-foreground">
+              URL de portada
+              <input
+                type="url"
+                maxLength="200"
+                inputMode="url"
+                autoComplete="url"
+                value={values.coverUrl}
+                onChange={(event) => updateField("coverUrl", event.target.value)}
+                aria-invalid={Boolean(errors.coverUrl)}
+                aria-describedby={errors.coverUrl ? "coverUrl-error coverUrl-help" : "coverUrl-help"}
+                className={inputClassName}
+                placeholder="https://example.com/book-cover.jpg"
+              />
+              <span id="coverUrl-help" className="mt-1.5 block text-xs font-normal leading-5 text-muted-foreground">Pega una URL completa que apunte a la imagen de portada.</span>
+              {errors.coverUrl && <span id="coverUrl-error" className="mt-1.5 block text-xs font-normal text-destructive">{errors.coverUrl}</span>}
+            </label>
+            {isValidCoverUrl(values.coverUrl) && values.coverUrl.trim() && (
+              <div className="mt-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Vista previa</p>
+                <div className="aspect-[2/3] w-28 overflow-hidden rounded-md border border-border bg-secondary shadow-[0_5px_18px_rgb(59_42_32_/_0.08)] sm:w-32">
+                  <BookCover book={{ id: book?.id ?? 0, title: values.title || "Nuevo libro", author: values.author, coverUrl: values.coverUrl.trim() }} />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </fieldset>
 

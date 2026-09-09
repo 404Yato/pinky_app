@@ -46,10 +46,11 @@ test("creates the complete Item and Book with one POST request", async () => {
     return new Response(JSON.stringify({ ...detail, favorite: true, possession_status: "LOANED", location: "Repisa", loaned_to: "Nicolás" }), { status: 201 });
   };
 
-  const book = await createBook({ title: "Piranesi", favorite: true, possessionStatus: "LOANED", location: "Repisa", loanedTo: "Nicolás", readingStatus: "PENDING" });
+  const book = await createBook({ title: "Piranesi", favorite: true, possessionStatus: "LOANED", location: "Repisa", loanedTo: "Nicolás", coverUrl: "https://example.com/cover", readingStatus: "PENDING" });
   assert.equal(book.favorite, true);
   assert.equal(book.possessionStatus, "LOANED");
   assert.equal(book.loanedTo, "Nicolás");
+  assert.equal(book.coverUrl, "https://example.com/cover");
   assert.equal(requests.length, 1);
   assert.equal(requests[0].options.method, "POST");
   assert.deepEqual(JSON.parse(requests[0].options.body), {
@@ -60,7 +61,7 @@ test("creates the complete Item and Book with one POST request", async () => {
     possession_status: "LOANED",
     location: "Repisa",
     loaned_to: "Nicolás",
-    details: { isbn: null, author: null, publisher: null, pages: null, publication_year: null, genre: null, cover_url: null, reading_status: "PENDING" },
+    details: { isbn: null, author: null, publisher: null, pages: null, publication_year: null, genre: null, cover_url: "https://example.com/cover", reading_status: "PENDING" },
   });
 });
 
@@ -71,10 +72,12 @@ test("resolves a successful update immediately without a post-save refetch", asy
     return new Response(JSON.stringify({ message: "updated", data: { ...detail, name: "Piranesi revisado", details: undefined } }), { status: 200 });
   };
 
-  const updated = await updateBook(4, { title: "Piranesi revisado", pages: "300" }, currentBook);
+  const updated = await updateBook(4, { title: "Piranesi revisado", pages: "300", coverUrl: "https://example.com/new-cover" }, currentBook);
   assert.equal(requests.length, 1);
   assert.equal(updated.title, "Piranesi revisado");
   assert.equal(updated.pages, 300);
+  assert.equal(updated.coverUrl, "https://example.com/new-cover");
+  assert.equal(JSON.parse(requests[0].options.body).details.cover_url, "https://example.com/new-cover");
 });
 
 test("accepts an empty successful update response and applies submitted values", async () => {

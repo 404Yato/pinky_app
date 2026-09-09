@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { bookApiResponseToViewModel, bookCreateCommandToApiPayload, bookFormToCreateCommand, bookMutationResponseToViewModel } from "./books.js";
+import { bookApiResponseToViewModel, bookCreateCommandToApiPayload, bookFormToCreateCommand, bookFormToUpdateCommand, bookMutationResponseToViewModel } from "./books.js";
 
 test("maps an API item with details to BookViewModel", () => {
   const book = bookApiResponseToViewModel({
@@ -19,15 +19,21 @@ test("maps an API item with details to BookViewModel", () => {
 });
 
 test("maps create commands to the generic item payload", () => {
-  const payload = bookCreateCommandToApiPayload(bookFormToCreateCommand({ title: "Piranesi", pages: "272", readingStatus: "PENDING" }));
+  const payload = bookCreateCommandToApiPayload(bookFormToCreateCommand({ title: "Piranesi", pages: "272", coverUrl: " https://example.com/piranesi ", readingStatus: "PENDING" }));
   assert.equal(payload.item_type, 1);
   assert.equal(payload.name, "Piranesi");
   assert.equal(payload.details.pages, 272);
   assert.equal(payload.details.reading_status, "PENDING");
+  assert.equal(payload.details.cover_url, "https://example.com/piranesi");
   assert.equal(payload.favorite, false);
   assert.equal(payload.possession_status, "OWNED");
   assert.equal(payload.location, null);
   assert.equal(payload.loaned_to, null);
+});
+
+test("maps replacing and removing a cover URL in update commands", () => {
+  assert.equal(bookFormToUpdateCommand({ coverUrl: "https://example.com/new-cover" }).book.cover_url, "https://example.com/new-cover");
+  assert.equal(bookFormToUpdateCommand({ coverUrl: "" }).book.cover_url, null);
 });
 
 test("maps update envelopes and empty success responses without losing existing fields", () => {
