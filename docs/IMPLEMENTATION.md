@@ -60,6 +60,7 @@ User
   └── Item
        ├── ItemType
        ├── Book
+       │    └── BookQuote
        └── Vinyl
 ```
 
@@ -87,6 +88,9 @@ The current Pinky frontend implements books only. Vinyl is documented here so th
 | `name` | string | No | Shared display name; exposed as `title` by the book view model |
 | `description` | string | No | Shared description; use an empty string when absent |
 | `favorite` | boolean | No | Shared favorite state; never belongs to Book or Vinyl |
+| `possession_status` | enum string | No | Shared possession state; one of `OWNED` or `LOANED`, defaulting to `OWNED` |
+| `location` | string | Yes | Normal or assigned physical location; up to 255 characters |
+| `loaned_to` | string | Yes | Current borrower when loaned; up to 255 characters |
 | `created_at` | ISO datetime string | No | Creation timestamp |
 | `updated_at` | ISO datetime string | No | Last-update timestamp |
 | `deleted_at` | ISO datetime string | Yes | Soft-deletion timestamp; `null` means active |
@@ -117,6 +121,17 @@ The current Pinky frontend implements books only. Vinyl is documented here so th
 | `discs` | integer | Yes | Disc count; domain values must never be strings |
 | `rpm` | integer | Yes | Playback speed; domain values must never be strings |
 
+### BookQuote
+
+| Field | Type | Nullable | Ownership and purpose |
+| --- | --- | --- | --- |
+| `id` | integer | No | Quote identifier; read-only |
+| `book` | integer / foreign key | No | Owning Book, determined by the quote endpoint URL and not submitted by the frontend |
+| `text` | string | No | Required, non-blank saved fragment |
+| `page` | non-negative integer | Yes | Optional page number; `null` when absent |
+| `created_at` | ISO datetime string | No | Creation timestamp; read-only |
+| `updated_at` | ISO datetime string | No | Last-update timestamp; read-only |
+
 ## Reading Status
 
 Book reading status is a canonical domain enum. The only valid stored values are:
@@ -143,6 +158,9 @@ BookViewModel.favorite    ← Item.favorite
 BookViewModel.createdAt   ← Item.created_at
 BookViewModel.updatedAt   ← Item.updated_at
 BookViewModel.deletedAt   ← Item.deleted_at
+BookViewModel.possessionStatus ← Item.possession_status
+BookViewModel.location         ← Item.location
+BookViewModel.loanedTo         ← Item.loaned_to
 ```
 
 Required Book mappings:
@@ -157,6 +175,18 @@ BookViewModel.genre           ← Book.genre
 BookViewModel.coverUrl        ← Book.cover_url
 BookViewModel.readingStatus   ← Book.reading_status
 ```
+
+Book quote API responses are mapped to a focused view model:
+
+```text
+BookQuoteViewModel.id        ← BookQuote.id
+BookQuoteViewModel.text      ← BookQuote.text
+BookQuoteViewModel.page      ← BookQuote.page
+BookQuoteViewModel.createdAt ← BookQuote.created_at
+BookQuoteViewModel.updatedAt ← BookQuote.updated_at
+```
+
+Possession status uses the exact backend values `OWNED` and `LOANED`. `location` remains independent from possession status. When a form changes away from `LOANED`, the frontend submits `loaned_to` as `null` so stale borrower data is not retained.
 
 The reverse mapping for create and update commands must explicitly send `title` to `Item.name`, `favorite` to `Item.favorite`, shared fields to Item data, and type-specific fields to Book detail data.
 
@@ -624,7 +654,8 @@ Potential information:
 * [x] Publication information
 * [x] Reading status
 * [x] Favorite state
-* [ ] User notes if appropriate
+* [x] Possession status and physical location
+* [x] Saved book quotes
 * [x] Actions
 
 Only display information represented by the mock data model.
@@ -637,6 +668,7 @@ Implement local frontend behavior for:
 * [x] Delete
 * [x] Change reading status
 * [x] Toggle favorite
+* [x] Create, edit, and delete saved quotes
 
 These actions must modify local application state only.
 
@@ -1271,8 +1303,8 @@ The production frontend now uses the Django REST API through a centralized JWT-a
 Current read-only backend compatibility notes:
 
 * Item listings omit type-specific details, so the frontend hydrates each book through the item-detail endpoint.
-* Book creation does not persist `favorite`; the frontend applies a follow-up update when necessary.
-* Create and update responses omit details, so the frontend retrieves the canonical item after mutations.
+* Book creation persists all shared Item fields and Book details in one `POST`; no follow-up mutation is required.
+* Create and update responses omit details, so mutation adapters combine the response with the validated command and existing view model.
 * Login uses Django `username`, not email.
 * Development uses the Vite `/api` proxy because the backend does not expose cross-origin headers.
 
