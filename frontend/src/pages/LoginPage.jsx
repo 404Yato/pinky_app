@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BookOpenText } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -19,7 +20,7 @@ export function LoginPage({ onLogin, successMessage, onDismissSuccess }) {
 
           <LoginForm onSubmit={onLogin} />
           <p className="mt-6 text-center text-xs leading-5 text-muted-foreground">Usa las credenciales de tu cuenta de Pinky para continuar.</p>
-          <p className="mt-4 text-center text-sm text-muted-foreground">¿Aún no tienes una cuenta? <a href="#/register" className="font-semibold text-primary underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Regístrate</a></p>
+          <p className="mt-4 text-center text-sm text-muted-foreground">¿Aún no tienes una cuenta? <Link to="/register" className="font-semibold text-primary underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Regístrate</Link></p>
     </AuthLayout>
   );
 }

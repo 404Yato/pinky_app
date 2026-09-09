@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { ArrowRight, Books, BookmarkSimple, Heart, MapPin, Quotes, Record } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
 
 import { LandingPreview } from "@/components/landing/LandingPreview";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,7 +18,7 @@ const secondaryLink = "h-11 px-5 text-sm";
 
 export function LandingPage({ authenticated = false }) {
   useEffect(() => { document.title = "Pinky | Tu colección, a tu manera"; }, []);
-  const primaryHref = authenticated ? "#/app" : "#/register";
+  const primaryTo = authenticated ? "/app" : "/register";
   const primaryLabel = authenticated ? "Ir a mi biblioteca" : "Crear mi cuenta";
 
   return (
@@ -26,17 +27,17 @@ export function LandingPage({ authenticated = false }) {
 
       <header className="border-b border-border/80 bg-background/95 backdrop-blur-sm">
         <nav aria-label="Navegación de presentación" className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:h-20 sm:px-6 lg:px-8">
-          <a href="#/" aria-label="Pinky, inicio" className="flex shrink-0 items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Link to="/" aria-label="Pinky, inicio" className="flex shrink-0 items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground"><Books aria-hidden="true" className="size-5" weight="duotone" /></span>
             <span className="font-heading text-xl font-semibold">Pinky</span>
-          </a>
+          </Link>
           <div className="ml-auto hidden items-center gap-6 text-sm font-medium text-muted-foreground sm:flex">
             <a href="#landing-main" className="rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Inicio</a>
             <a href="#caracteristicas" className="rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Características</a>
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-2 sm:ml-3">
-            {!authenticated && <a href="#/login" className={cn(buttonVariants({ variant: "ghost" }), "hidden h-10 px-3 text-sm min-[400px]:inline-flex")}>Iniciar sesión</a>}
-            <a href={primaryHref} className={cn(buttonVariants(), "h-10 px-3 text-sm sm:px-4")}>{authenticated ? "Ir a Pinky" : "Crear cuenta"}</a>
+            {!authenticated && <Link to="/login" className={cn(buttonVariants({ variant: "ghost" }), "hidden h-10 px-3 text-sm min-[400px]:inline-flex")}>Iniciar sesión</Link>}
+            <Link to={primaryTo} className={cn(buttonVariants(), "h-10 px-3 text-sm sm:px-4")}>{authenticated ? "Ir a Pinky" : "Crear cuenta"}</Link>
           </div>
         </nav>
       </header>
@@ -50,8 +51,8 @@ export function LandingPage({ authenticated = false }) {
               <h1 className="mt-5 font-heading text-4xl font-semibold leading-[1.08] tracking-tight min-[400px]:text-5xl sm:text-6xl xl:text-7xl">Tu colección,<br /><span className="text-primary">a tu manera.</span></h1>
               <p className="mt-6 max-w-xl text-base leading-8 text-muted-foreground sm:text-lg">Organiza tus libros, recuerda dónde están, guarda tus fragmentos favoritos y lleva contigo la historia de cada ejemplar.</p>
               <div className="mt-8 flex flex-col gap-3 min-[400px]:flex-row">
-                <a href={primaryHref} className={cn(buttonVariants(), primaryLink)}>{primaryLabel}<ArrowRight aria-hidden="true" /></a>
-                {!authenticated && <a href="#/login" className={cn(buttonVariants({ variant: "outline" }), secondaryLink)}>Iniciar sesión</a>}
+                <Link to={primaryTo} className={cn(buttonVariants(), primaryLink)}>{primaryLabel}<ArrowRight aria-hidden="true" /></Link>
+                {!authenticated && <Link to="/login" className={cn(buttonVariants({ variant: "outline" }), secondaryLink)}>Iniciar sesión</Link>}
               </div>
               <p className="mt-6 text-sm text-muted-foreground">Sin feeds. Sin seguidores. Solo tus libros y la forma en que viven contigo.</p>
             </div>
@@ -97,8 +98,8 @@ export function LandingPage({ authenticated = false }) {
             <h2 className="mt-5 font-heading text-3xl font-semibold sm:text-4xl">Hazle un lugar a tus historias.</h2>
             <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-muted-foreground">Tu biblioteca personal puede empezar con un solo libro.</p>
             <div className="mt-8 flex flex-col justify-center gap-3 min-[400px]:flex-row">
-              <a href={primaryHref} className={cn(buttonVariants(), primaryLink)}>{primaryLabel}</a>
-              {!authenticated && <a href="#/login" className={cn(buttonVariants({ variant: "outline" }), secondaryLink)}>Entrar a Pinky</a>}
+              <Link to={primaryTo} className={cn(buttonVariants(), primaryLink)}>{primaryLabel}</Link>
+              {!authenticated && <Link to="/login" className={cn(buttonVariants({ variant: "outline" }), secondaryLink)}>Entrar a Pinky</Link>}
             </div>
           </div>
         </section>

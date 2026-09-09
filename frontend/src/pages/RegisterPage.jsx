@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BookOpenText } from "@phosphor-icons/react";
+import { Link } from "react-router-dom";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { RegisterForm } from "@/components/auth/RegisterForm";
@@ -13,7 +14,7 @@ export function RegisterPage({ onRegister }) {
       <h1 id="register-title" className="mt-3 font-heading text-3xl font-semibold tracking-tight text-foreground min-[380px]:text-4xl sm:text-5xl">Crea tu cuenta</h1>
       <p className="mt-4 text-base leading-7 text-muted-foreground">Prepara un rincón propio para organizar tus próximas historias.</p>
       <RegisterForm onSubmit={onRegister} />
-      <p className="mt-6 text-center text-sm text-muted-foreground">¿Ya tienes una cuenta? <a href="#/login" className="font-semibold text-primary underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Inicia sesión</a></p>
+      <p className="mt-6 text-center text-sm text-muted-foreground">¿Ya tienes una cuenta? <Link to="/login" className="font-semibold text-primary underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Inicia sesión</Link></p>
     </AuthLayout>
   );
 }
