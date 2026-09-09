@@ -45,3 +45,38 @@ test("treats an empty 204 response as a successful null result", async () => {
   globalThis.fetch = async () => new Response(null, { status: 204 });
   assert.equal(await apiRequest("/inventory/items/4/", { method: "DELETE", auth: false }), null);
 });
+
+test("keeps authenticated bodyless requests free of unnecessary content headers", async () => {
+  setTokens({ access: "access-token", refresh: "refresh-token" });
+  let request;
+  globalThis.fetch = async (url, options) => {
+    request = { url, options };
+    return new Response(JSON.stringify([]), { status: 200 });
+  };
+
+  await apiRequest("/inventory/items/");
+
+  assert.equal(request.options.method, "GET");
+  assert.equal(request.options.headers.Accept, "application/json");
+  assert.equal(request.options.headers.Authorization, "Bearer access-token");
+  assert.equal(request.options.headers["Content-Type"], undefined);
+  assert.equal(request.options.body, undefined);
+});
+
+test("adds the JSON content type only when a request has a body", async () => {
+  let request;
+  globalThis.fetch = async (url, options) => {
+    request = { url, options };
+    return new Response(JSON.stringify({ username: "reader" }), { status: 201 });
+  };
+
+  await apiRequest("/auth/register/", {
+    method: "POST",
+    auth: false,
+    body: { username: "reader" },
+  });
+
+  assert.equal(request.options.headers["Content-Type"], "application/json");
+  assert.equal(request.options.headers.Authorization, undefined);
+  assert.equal(request.options.body, JSON.stringify({ username: "reader" }));
+});
