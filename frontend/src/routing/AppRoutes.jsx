@@ -13,6 +13,7 @@ import {
 import { AuthLoadingState } from "@/components/auth/AuthLoadingState";
 import { AppShell } from "@/components/layout/AppShell";
 import { getFocusedCollection, getFocusedCollectionByPath } from "@/config/collections";
+import { LibraryProvider, useLibrary } from "@/context/LibraryContext";
 import { BookDetailPage } from "@/pages/BookDetailPage";
 import { BookFormPage } from "@/pages/BookFormPage";
 import { FocusedCollectionPage } from "@/pages/FocusedCollectionPage";
@@ -96,9 +97,11 @@ function AuthenticatedLayout({ auth }) {
   };
 
   return (
-    <AppShell title={title} pageKey={`${location.pathname}:${location.key}`} activeItem={activeItem} onNavigate={handleNavigate} user={auth.user} onLogout={handleLogout}>
-      <Outlet />
-    </AppShell>
+    <LibraryProvider>
+      <AppShell title={title} pageKey={`${location.pathname}:${location.key}`} activeItem={activeItem} onNavigate={handleNavigate} user={auth.user} onLogout={handleLogout}>
+        <Outlet />
+      </AppShell>
+    </LibraryProvider>
   );
 }
 
@@ -138,6 +141,7 @@ function BookDetailRoute() {
   const { bookId: rawBookId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { removeBook, upsertBook } = useLibrary();
   const bookId = parseBookId(rawBookId);
   if (bookId === null) return <Navigate to={ROUTES.landing} replace />;
 
@@ -148,7 +152,11 @@ function BookDetailRoute() {
       onBack={() => navigate(returnTo)}
       onEdit={() => navigate(`/library/${bookId}/edit`, { state: { returnTo } })}
       onEditComments={() => navigate(`/library/${bookId}/edit#comments`, { state: { returnTo } })}
-      onDeleted={() => navigate(returnTo, { state: { success: "deleted" } })}
+      onBookUpdated={upsertBook}
+      onDeleted={(deletedBook) => {
+        removeBook(deletedBook.id);
+        navigate(returnTo, { state: { success: "deleted" } });
+      }}
       successMessage={getSuccessMessage(location.state)}
       onDismissSuccess={() => navigate(`/library/${bookId}`, { replace: true, state: { returnTo } })}
     />
@@ -159,6 +167,7 @@ function BookFormRoute({ editing = false }) {
   const { bookId: rawBookId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { upsertBook } = useLibrary();
   const bookId = editing ? parseBookId(rawBookId) : null;
   if (editing && bookId === null) return <Navigate to={ROUTES.landing} replace />;
 
@@ -168,7 +177,10 @@ function BookFormRoute({ editing = false }) {
       bookId={bookId}
       scrollTarget={editing && location.hash === "#comments" ? "comments" : null}
       onCancel={() => navigate(editing ? `/library/${bookId}` : ROUTES.library, { state: editing ? { returnTo } : null })}
-      onSaved={(book, action) => navigate(`/library/${book.id}`, { state: { success: action, returnTo } })}
+      onSaved={(book, action) => {
+        upsertBook(book);
+        navigate(`/library/${book.id}`, { state: { success: action, returnTo } });
+      }}
     />
   );
 }

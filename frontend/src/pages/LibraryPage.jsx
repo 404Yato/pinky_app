@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Plus } from "@phosphor-icons/react";
 
 import { BookFilters } from "@/components/books/BookFilters";
@@ -8,19 +7,21 @@ import { LoadingBookGrid } from "@/components/books/LoadingBookGrid";
 import { Button } from "@/components/ui/button";
 import { StatusNotice } from "@/components/feedback/StatusNotice";
 import { DEFAULT_BOOK_QUERY } from "@/constants/books";
+import { useLibrary } from "@/context/LibraryContext";
 import { useBooks } from "@/hooks/useBooks";
 
 export function LibraryPage({ onSelectBook, onCreateBook, successMessage, onDismissSuccess }) {
-  const [filters, setFilters] = useState({ ...DEFAULT_BOOK_QUERY });
+  const { collectionQueries, setCollectionQuery } = useLibrary();
+  const filters = collectionQueries.library;
   const { books, status, retry } = useBooks(filters);
 
   const hasActiveFilters = Boolean(filters.search || filters.status || filters.favorite !== null || filters.genre);
 
   const handleChange = (field, value) => {
-    setFilters((current) => field === "sort" ? { ...current, ...value } : { ...current, [field]: value });
+    setCollectionQuery("library", (current) => field === "sort" ? { ...current, ...value } : { ...current, [field]: value });
   };
 
-  const resetFilters = () => setFilters({ ...DEFAULT_BOOK_QUERY });
+  const resetFilters = () => setCollectionQuery("library", { ...DEFAULT_BOOK_QUERY });
 
   return (
     <div>

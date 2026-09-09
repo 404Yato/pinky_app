@@ -28,7 +28,7 @@ function DetailState({ notFound, onBack, onRetry }) {
   );
 }
 
-export function BookDetailPage({ bookId, onBack, onEdit, onEditComments, onDeleted, successMessage, onDismissSuccess }) {
+export function BookDetailPage({ bookId, onBack, onEdit, onEditComments, onBookUpdated, onDeleted, successMessage, onDismissSuccess }) {
   const { book, setBook, status, retry } = useBook(bookId);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -47,6 +47,7 @@ export function BookDetailPage({ bookId, onBack, onEdit, onEditComments, onDelet
     try {
       const updatedBook = await toggleFavorite(book.id, book);
       setBook(updatedBook);
+      onBookUpdated?.(updatedBook);
       setActionSuccess(updatedBook.favorite ? "Libro agregado a tus favoritos." : "Libro eliminado de tus favoritos.");
     } catch {
       setActionError("No pudimos actualizar el favorito.");
@@ -62,6 +63,7 @@ export function BookDetailPage({ bookId, onBack, onEdit, onEditComments, onDelet
     try {
       const updatedBook = await updateReadingStatus(book.id, event.target.value, book);
       setBook(updatedBook);
+      onBookUpdated?.(updatedBook);
       setActionSuccess("Estado de lectura actualizado.");
     } catch {
       setActionError("No pudimos actualizar el estado de lectura.");

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { BookmarkSimple, CheckCircle, Clock, Heart } from "@phosphor-icons/react";
 
 import { BookFilters } from "@/components/books/BookFilters";
@@ -7,6 +7,7 @@ import { LibraryEmptyState, LibraryErrorState } from "@/components/books/Library
 import { LoadingBookGrid } from "@/components/books/LoadingBookGrid";
 import { StatusNotice } from "@/components/feedback/StatusNotice";
 import { DEFAULT_BOOK_QUERY } from "@/constants/books";
+import { useLibrary } from "@/context/LibraryContext";
 import { useBooks } from "@/hooks/useBooks";
 
 const collectionIcons = {
@@ -17,7 +18,8 @@ const collectionIcons = {
 };
 
 export function FocusedCollectionPage({ collection, onSelectBook, successMessage, onDismissSuccess }) {
-  const [filters, setFilters] = useState(() => ({ ...DEFAULT_BOOK_QUERY, ...collection.query }));
+  const { collectionQueries, setCollectionQuery } = useLibrary();
+  const filters = collectionQueries[collection.id] ?? { ...DEFAULT_BOOK_QUERY, ...collection.query };
   const query = useMemo(() => ({ ...filters, ...collection.query }), [collection, filters]);
   const { books, status, retry } = useBooks(query);
   const fixedStatus = collection.query.status !== undefined;
@@ -25,10 +27,10 @@ export function FocusedCollectionPage({ collection, onSelectBook, successMessage
   const hasActiveFilters = Boolean(filters.search || (!fixedStatus && filters.status) || (!fixedFavorite && filters.favorite !== null));
 
   const handleChange = (field, value) => {
-    setFilters((current) => field === "sort" ? { ...current, ...value } : { ...current, [field]: value });
+    setCollectionQuery(collection.id, (current) => field === "sort" ? { ...current, ...value } : { ...current, [field]: value });
   };
 
-  const resetFilters = () => setFilters({ ...DEFAULT_BOOK_QUERY, ...collection.query });
+  const resetFilters = () => setCollectionQuery(collection.id, { ...DEFAULT_BOOK_QUERY, ...collection.query });
   const Icon = collectionIcons[collection.icon];
 
   return (

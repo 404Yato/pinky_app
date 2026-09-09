@@ -25,9 +25,9 @@ export function DeleteBookDialog({ book, open, onClose, onDeleted }) {
     setDeleting(true);
     setError("");
     try {
-      await deleteBook(book.id, book);
+      const deletedBook = await deleteBook(book.id, book);
       onClose();
-      onDeleted();
+      onDeleted(deletedBook);
     } catch {
       setError("No pudimos eliminar el libro. Intenta nuevamente.");
     } finally {
