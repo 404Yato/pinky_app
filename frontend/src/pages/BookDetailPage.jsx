@@ -28,7 +28,7 @@ function DetailState({ notFound, onBack, onRetry }) {
   );
 }
 
-export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessage, onDismissSuccess }) {
+export function BookDetailPage({ bookId, onBack, onEdit, onEditComments, onDeleted, successMessage, onDismissSuccess }) {
   const { book, setBook, status, retry } = useBook(bookId);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -136,7 +136,7 @@ export function BookDetailPage({ bookId, onBack, onEdit, onDeleted, successMessa
           </section>
 
           <BookPossessionDetails book={book} />
-          <BookComments comments={book.comments} onEdit={onEdit} />
+          <BookComments comments={book.comments} onEdit={onEditComments} />
         </div>
       </article>
 

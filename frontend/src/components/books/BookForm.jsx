@@ -186,12 +186,12 @@ export function BookForm({ book = null, onSubmit, onCancel }) {
         </div>
       </fieldset>
 
-      <fieldset className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-7">
+      <fieldset id="comments" className="min-w-0 scroll-mt-24 rounded-lg border border-border bg-card p-4 sm:p-7">
         <legend className="px-2 font-heading text-xl font-semibold">Comentarios personales</legend>
         <p id="comments-help" className="mb-4 text-sm leading-6 text-muted-foreground">Guarda aquí recuerdos, impresiones o notas personales sobre este libro. Puedes darles formato con la barra sin aprender Markdown.</p>
-        <label htmlFor="comments" className="sr-only">Comentarios personales</label>
+        <label htmlFor="comments-editor" className="sr-only">Comentarios personales</label>
         <MarkdownEditor
-          id="comments"
+          id="comments-editor"
           value={values.comments}
           onChange={(comments) => updateField("comments", comments)}
           disabled={submitting}

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { ArrowLeft, BookOpen, WarningCircle } from "@phosphor-icons/react";
 
 import { BookDetailSkeleton } from "@/components/books/BookDetailSkeleton";
@@ -6,9 +7,25 @@ import { Button } from "@/components/ui/button";
 import { useBook } from "@/hooks/useBook";
 import { createBook, updateBook } from "@/services/api/books";
 
-export function BookFormPage({ bookId = null, onCancel, onSaved }) {
+export function BookFormPage({ bookId = null, scrollTarget = null, onCancel, onSaved }) {
   const editing = bookId !== null;
   const { book, status, retry } = useBook(bookId, { enabled: editing });
+
+  useEffect(() => {
+    if (!scrollTarget || status !== "success") return undefined;
+
+    let secondFrame;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        document.getElementById(scrollTarget)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      if (secondFrame) window.cancelAnimationFrame(secondFrame);
+    };
+  }, [scrollTarget, status]);
 
   if (editing && status === "loading") return <BookDetailSkeleton label="Cargando edición del libro" />;
   if (editing && (status === "not-found" || status === "error")) {

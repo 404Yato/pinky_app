@@ -147,6 +147,7 @@ function BookDetailRoute() {
       bookId={bookId}
       onBack={() => navigate(returnTo)}
       onEdit={() => navigate(`/library/${bookId}/edit`, { state: { returnTo } })}
+      onEditComments={() => navigate(`/library/${bookId}/edit#comments`, { state: { returnTo } })}
       onDeleted={() => navigate(returnTo, { state: { success: "deleted" } })}
       successMessage={getSuccessMessage(location.state)}
       onDismissSuccess={() => navigate(`/library/${bookId}`, { replace: true, state: { returnTo } })}
@@ -165,6 +166,7 @@ function BookFormRoute({ editing = false }) {
   return (
     <BookFormPage
       bookId={bookId}
+      scrollTarget={editing && location.hash === "#comments" ? "comments" : null}
       onCancel={() => navigate(editing ? `/library/${bookId}` : ROUTES.library, { state: editing ? { returnTo } : null })}
       onSaved={(book, action) => navigate(`/library/${book.id}`, { state: { success: action, returnTo } })}
     />
