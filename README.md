@@ -24,7 +24,7 @@ Explore the current visual prototype:
 
 Explore the REST API and its interactive documentation:
 
-[https://pinky-api.up.railway.app/api/docs](https://pinky-api.up.railway.app/api/docs)
+[https://pinky-api.duckdns.org/api/docs/](https://pinky-api.duckdns.org/api/docs/)
 
 ---
 
