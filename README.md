@@ -18,7 +18,7 @@ Every screen should feel less like a management application and more like a phys
 
 Explore the current visual prototype:
 
-[https://cmts-pinky-app.vercel.app/](https://cmts-pinky-app.vercel.app/)
+[https://pinkyapp.vercel.app/](https://pinkyapp.vercel.app/)
 
 ### Backend API
 
