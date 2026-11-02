@@ -14,18 +14,17 @@ Every screen should feel less like a management application and more like a phys
 
 # Live Demo
 
-### Frontend Prototype
+### Frontend Demo
 
-Explore the current visual prototype:
-
-[https://pinkyapp.vercel.app/](https://pinkyapp.vercel.app/)
+<a href="https://pinkyapp.vercel.app/" target="_blank" rel="noopener noreferrer">
+  Explore the current visual prototype
+</a>
 
 ### Backend API
 
-Explore the REST API and its interactive documentation:
-
-[https://pinky-api.duckdns.org/api/docs/](https://pinky-api.duckdns.org/api/docs/)
-
+<a href="https://pinky-api.duckdns.org/api/docs/" target="_blank" rel="noopener noreferrer">
+  Explore the REST API and its interactive documentation
+</a>
 ---
 
 # Vision
