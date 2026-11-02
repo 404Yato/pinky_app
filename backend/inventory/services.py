@@ -106,7 +106,11 @@ def update_item(pk, user, data):
 
     # Load the item owned by the user; updates can target base fields and details.
     try:
-        item = models.Item.objects.get(pk=pk, user=user)
+        item = get_active_item(pk, user)
+
+        if not item:
+            raise NotFound("Item Not Found.")
+        
     except models.Item.DoesNotExist:
         raise NotFound("Item Not Found.")
     
@@ -124,13 +128,13 @@ def update_item(pk, user, data):
         partial=True
     )
 
-    if not serializer.is_valid():
-        raise ValidationError(serializer.error)
+    serializer.is_valid(raise_exception=True)
 
     with transaction.atomic():
         # Save base item data and matching detail data as one atomic update.
         serializer.save()
 
+    if details_data is not None:
         update_item_details(
             item,
             details_data
@@ -171,12 +175,18 @@ def get_item_details(item):
         return None
     
 def create_item_details(item, details_data):
+    
+    if not details_data:
+        raise ValidationError({
+            "details": "This field is required for this item type."
+        })
+   
     # Create the typed details record only for item types that require one.
     detail_type = item.item_type.detail_type
 
     if detail_type not in DETAIL_SERIALIZER:
         return
-    
+
     model, serializer_class = DETAIL_SERIALIZER[detail_type]
 
     serializer = serializer_class(

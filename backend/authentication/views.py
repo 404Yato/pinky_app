@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.exceptions import ValidationError
 from drf_spectacular.utils import (extend_schema, OpenApiResponse, OpenApiExample)
 
 from .serializers import RegisterSerializer, RegisterResponseSerializer, LoginSerializer, LoginResponseSerializer, ErrorResponseSerializer, LogoutResponseSerializer, LogoutSerializer, RefreshTokenSerializer, RefreshTokenResponseSerializer
@@ -168,28 +170,22 @@ def register(request):
 )
 @api_view(['POST'])
 def logout(request):
+    serializer = LogoutSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
     try:
-        serializer = LogoutSerializer(data=request.data)
-
-        serializer.is_valid(raise_exception=True)
-
-        refresh_token = serializer.validated_data["refresh"]
-
-        token = RefreshToken( refresh_token )
-
+        token = RefreshToken(
+            serializer.validated_data["refresh"]
+        )
         token.blacklist()
 
+    except TokenError:
         return Response(
-            {
-                "message" : "Logged out successfully."
-            },
-            status=status.HTTP_200_OK
+            {"error": "Invalid or expired token."},
+            status=status.HTTP_400_BAD_REQUEST
         )
-    
-    except Exception:
-       return Response(
-           {
-               "error" : "Invalid Token"
-           },
-           status=status.HTTP_400_BAD_REQUEST
-       )
+
+    return Response(
+        {"message": "Logged out successfully."},
+        status=status.HTTP_200_OK
+    )

@@ -2,10 +2,32 @@ from rest_framework import serializers
 from .models import Item, ItemType, Book, Vinyl, BookQuote
 
 class ItemSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Item
-        fields = '__all__'
+        fields = [
+            "id",
+            "user",
+            "item_type",
+            "name",
+            "description",
+            "favorite",
+            "comments",
+            "possession_status",
+            "location",
+            "loaned_to",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+            "item_type",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+        ]
 
 class ItemListSerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
@@ -62,7 +84,7 @@ class ItemCreateSerializer(serializers.Serializer):
         required=False,
         allow_blank=True
     )
-    favorite = serializers.BooleanField()
+    favorite = serializers.BooleanField(required=False, default=False)
     comments = serializers.CharField(
         required=False,
         allow_blank=True
@@ -85,6 +107,23 @@ class ItemCreateSerializer(serializers.Serializer):
         "Objeto JSON cuyos campos dependen del tipo de item."
     )
     )
+
+    def validate_item_type(self, value):
+        if not ItemType.objects.filter(pk=value).exists():
+            raise serializers.ValidationError(
+                "The selected item type does not exist."
+            )
+        return value
+
+    def validate_possession_status(self, value):
+        allowed = {"OWNED", "LOANED"}
+
+        if value not in allowed:
+            raise serializers.ValidationError(
+                "Invalid possession status."
+            )
+
+        return value
 
 class ItemResponseSerializer(serializers.Serializer):
 
