@@ -2,72 +2,89 @@
 
 PinkyApp is a personal digital library designed for readers who enjoy keeping their books organized, documented, and always within reach.
 
-Rather than being just a catalog, PinkyApp aims to provide a cozy and enjoyable space where every bookshelf tells a story, making it easy to manage your personal library, track your reading journey, and rediscover your favorite books.
+More than just a catalog, PinkyApp aims to provide a cozy and enjoyable space where every bookshelf tells a story. It brings together book organization, personal notes, and reading-related features in an environment designed around the experience of owning and enjoying books.
 
-Every screen in PinkyApp should feel less like a management application and more like a physical space dedicated to books and their readers.
+Every screen should feel less like a management application and more like a physical space dedicated to books and their readers.
 
-<img width="500" height="500" alt="pinkyapp-icon" src="https://github.com/user-attachments/assets/ff525916-3ef6-40db-a48b-7b4b175e23ad" />
+<p align="center">
+  <img width="300" alt="PinkyApp icon" src="https://github.com/user-attachments/assets/ff525916-3ef6-40db-a48b-7b4b175e23ad" />
+</p>
 
 ---
 
 # Live Demo
 
+### Frontend Prototype
+
+Explore the current visual prototype:
+
+[https://cmts-pinky-app.vercel.app/](https://cmts-pinky-app.vercel.app/)
+
 ### Backend API
 
-https://pinky-api.up.railway.app/api/docs
+Explore the REST API and its interactive documentation:
 
-### Frontend (Prototype)
-
-https://cmts-pinky-app.vercel.app/
-
----
-
-# Tech Stack
-
-- **Backend:** Django + Django REST Framework
-- **Frontend:** React + Vite
-- **Database:** PostgreSQL
-- **Authentication:** JWT
-- **API Documentation:** OpenAPI + Swagger
-- **Deployment:** Docker + Gunicorn
+[https://pinky-api.up.railway.app/api/docs](https://pinky-api.up.railway.app/api/docs)
 
 ---
 
 # Vision
 
-PinkyApp is being built around a single idea:
+PinkyApp is being built around a simple idea:
 
-> **Creating the digital library we would love to use ourselves.**
+**Creating the digital library we would love to use ourselves.**
 
-Instead of trying to support every possible collectible, PinkyApp focuses exclusively on books, allowing the experience, interface, and features to revolve entirely around reading and personal libraries.
+Instead of trying to support every possible type of collection, PinkyApp focuses exclusively on books. This allows the interface, features, and overall experience to revolve around reading and personal libraries.
 
-The goal is to create a calm, welcoming, and visually pleasing place where readers can organize, explore, and enjoy their collections.
+The goal is to create a calm, welcoming, and visually pleasing place where readers can organize, explore, document, and enjoy their collections.
+
+Its visual identity draws inspiration from the warmth of a personal library: wooden bookshelves, coffee, and the feeling of having a space of your own.
+
+---
+
+# Tech Stack
+
+| Area | Technology |
+|---|---|
+| Frontend | React 19, Vite 7 |
+| Styling | Tailwind CSS |
+| Backend | Python, Django 6, Django REST Framework |
+| Database | PostgreSQL |
+| Authentication | JWT (SimpleJWT) |
+| API Documentation | OpenAPI, drf-spectacular, Swagger UI |
+| Deployment | Docker, Gunicorn |
 
 ---
 
 # Current Features
 
-- JWT authentication
-- Personal book library
-- User-owned collections
-- REST API
-- PostgreSQL integration
-- OpenAPI / Swagger documentation
-- Docker development environment
-- Production-ready deployment
+### Application
+
+- Personal book collection management.
+- Book information and metadata.
+- Book details and reading-related information.
+- Personal reviews and notes.
+- Quote management, allowing users to save and organize memorable passages from their books.
+- ISBN-based book lookup and metadata assistance.
+- A reader-first interface with a warm, library-inspired visual identity.
+
+### Backend
+
+- JWT authentication and token management.
+- User-owned collections and access control.
+- REST API for book management.
+- Book-related information and quote management.
+- PostgreSQL integration.
+- OpenAPI / Swagger documentation.
+- Docker-based development and deployment configuration.
 
 ---
 
 # Planned Features
 
-- Personal bookshelves
-- Reading status tracking
-- Reading progress
-- Favorites
-- Ratings and reviews
-- Reading statistics
-- Beautiful bookshelf visualization
-- Responsive interface
+- Customizable personal bookshelves.
+- Favorites and ratings.
+- More detailed bookshelf visualization.
 
 ---
 
@@ -77,6 +94,10 @@ The goal is to create a calm, welcoming, and visually pleasing place where reade
 pinkyapp/
 │
 ├── backend/                 # Django REST API
+│   ├── inventory/
+│   ├── config/
+│   └── README.md
+│
 ├── frontend/                # React + Vite application
 │
 ├── docker-compose.yml
@@ -88,26 +109,32 @@ pinkyapp/
 
 ---
 
-# Backend
+# Frontend
 
-The backend exposes a REST API developed with Django REST Framework.
+The frontend is built with React and Vite, with a strong emphasis on visual identity and user experience.
 
-Additional documentation is available at:
+Its design direction moves away from conventional administrative dashboards and focuses on a cozy, personal library atmosphere.
 
-```text
-backend/README.md
-```
+The interface is being developed around three principles:
+
+- **Comfort:** A warm and welcoming visual environment.
+- **Simplicity:** Clear interactions without unnecessary complexity.
+- **Personality:** An interface that feels like a personal space rather than generic management software.
+
+The frontend is currently under active development.
 
 ---
 
-# Frontend
+# Backend
 
-The frontend is currently being rebuilt using React and Vite with a reader-first experience.
+The backend provides the REST API that powers PinkyApp.
 
-Future documentation will be available at:
+It is built with Django REST Framework and PostgreSQL, following a service-oriented structure for business logic and using JWT authentication to protect user data.
+
+For installation instructions, configuration details, API endpoints, and testing information, see:
 
 ```text
-frontend/README.md
+backend/README.md
 ```
 
 ---
@@ -126,21 +153,17 @@ docker compose up --build
 docker compose -f docker-compose.prod.yml up --build
 ```
 
+For additional setup instructions, refer to the backend documentation.
+
 ---
 
 # Project Status
 
-🟡 Active Development
+<sub>🟡 Active Development</sub>
 
-The backend has reached a functional MVP, including:
+PinkyApp currently has a functional backend MVP, including authentication, book management, quote management, PostgreSQL integration, and API documentation.
 
-- Authentication
-- Book management API
-- Swagger documentation
-- PostgreSQL integration
-- Dockerized deployment
-
-The current focus is the complete redesign and implementation of the frontend to deliver a reader-centered experience.
+The frontend is undergoing an ongoing redesign and implementation process, with the goal of turning the initial prototype into a complete, cohesive digital library experience.
 
 ---
 

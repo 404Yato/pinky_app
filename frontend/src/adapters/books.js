@@ -143,7 +143,13 @@ export function bookCreateCommandToApiPayload(command) {
 }
 
 export function bookUpdateCommandToApiPayload(command) {
-  return { ...command.item, details: command.book };
+  const payload = { ...command.item };
+
+  if (Object.keys(command.book).length > 0) {
+    payload.details = command.book;
+  }
+
+  return payload;
 }
 
 export function bookMutationResponseToItem(currentItem, command, response) {
