@@ -99,7 +99,8 @@ class ItemCreateSerializer(serializers.Serializer):
     )
     loaned_to = serializers.CharField(
         required=False,
-        allow_blank=True
+        allow_blank=True,
+        allow_null=True
     )
     details = serializers.JSONField(
         required=False,
