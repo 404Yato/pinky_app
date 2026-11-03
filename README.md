@@ -14,8 +14,6 @@ Every screen should feel less like a management application and more like a phys
 
 # Live Demo
 
-### Frontend Prototype
-
 Explore the current visual prototype:
 
 [https://pinkyapp.vercel.app/](https://pinkyapp.vercel.app/)
@@ -24,7 +22,7 @@ Explore the current visual prototype:
 
 Explore the REST API and its interactive documentation:
 
-[https://pinky-api.up.railway.app/api/docs](https://pinky-api.up.railway.app/api/docs)
+[https://pinky-api.duckdns.org/api/docs/](https://pinky-api.duckdns.org/api/docs/)
 
 ---
 
